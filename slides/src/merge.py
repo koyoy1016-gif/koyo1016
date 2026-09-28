@@ -31,5 +31,11 @@ for s in new.slides:
         dn = ns.notes_slide
         dst_tree = dn.shapes._spTree
         dst_tree.getparent().replace(dst_tree, copy.deepcopy(src_tree))
+from script import SCRIPT
+for n, txt in SCRIPT.items():
+    sl = orig.slides[n-1]
+    tf = sl.notes_slide.notes_text_frame
+    assert tf is not None, n
+    tf.text = txt
 orig.save('merged.pptx')
 print('slides', len(orig.slides))

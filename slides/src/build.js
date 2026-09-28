@@ -158,7 +158,7 @@ function miniPlan(s, cx, cy, u, arr, o = {}) {
 }
 
 // PART 7 の話の流れ（今どこにいるか）
-const STORY = ["① 全部を計算するのは無理", "② 1棟ずつの結果を足して埋める", "③ 足し算の弱点＝影の重なり", "④ 足し算を式で書く", "⑤ 来週SEBEで確かめる"];
+const STORY = ["① なぜ6,561通り？", "② 分けて計算→足し算", "③ ずれの原因＝影の重なり", "④ 式で書く（Σ）", "⑤ 来週SEBEで確かめる"];
 function story(s, idx) {
   const w = 2.52, gap = 0.44 / 4;
   STORY.forEach((t, i) => {
@@ -196,7 +196,7 @@ function story(s, idx) {
   const parts = [
     ["PART 5", "データと計算過程の整理", "学習16・検証8・テスト12などの役割と、Σを使った計算式", "p.20–24", "Q1"],
     ["PART 6", "最終目標ツールの変数", "平面図・立体図で17個の変数の位置と、0/1変数を使う理由", "p.25–28", "Q2"],
-    ["PART 7", "4方向での線形補間", "全部は計算できない → 1棟ずつ足し算で埋める → 弱点の影の重なり → 来週の確認", "p.29–33", "Q3"],
+    ["PART 7", "4方向での線形補間", "なぜ6,561通り？ → 分けて計算し足し算で推定 → 影の重なりのずれを来週確認", "p.29–33", "Q3"],
     ["PART 8", "代案：空の遮られ方", "線形補間でうまくいかない場合の方法の概要（詳細は来週）", "p.34–35", "Q3"],
   ];
   parts.forEach((p, i) => {
@@ -294,20 +294,21 @@ function story(s, idx) {
   }
   T(s, "幅50m（50区画）", { x: wx, y: wy + wh + 0.02, w: ww, h: 0.24, fontSize: 8.5, color: C.muted, align: "center" });
   T(s, bullets([
-    "1マス＝壁の1m四方の区画。SEBEが年間日射量 G を1つずつ出す",
+    "1マス＝1m四方の区画 (p, q)。p は横、q は縦の番号。SEBEが年間日射量 G を出す",
     "1つの帯＝幅50×高さ10＝500区画",
     "南面全体＝50×50＝2,500区画",
     "5帯とも面積が同じ → 全体平均は5帯の平均と同じ",
   ], { gap: 5 }), { x: 4.0, y: 2.05, w: 2.6, h: 2.5, fontSize: 9.5 });
 
-  R(s, 0.65, 4.8, 5.9, 1.98, C.navy, { round: true, rr: 0.06 });
+  R(s, 0.65, 4.72, 5.9, 2.1, C.navy, { round: true, rr: 0.06 });
   T(s, ML([
-    ["帯の平均（式）：y_{k} ＝ (1/500) Σ G　…帯kの500区画を足して500で割る", { color: "CADCFC", fontSize: 10 }],
-    ["帯1に代入　　：y_{1} ＝ 168,670.31 ÷ 500 ＝ 337.34 kWh/m²", { color: C.white }],
-    ["全体平均（式）：ȳ ＝ (y_{1}＋y_{2}＋y_{3}＋y_{4}＋y_{5}) / 5", { color: "CADCFC", fontSize: 10 }],
-    ["代入：(337.34＋351.22＋382.57＋485.55＋867.14)/5 ＝ 484.76", { color: C.orange }],
-  ]), { x: 0.8, y: 4.88, w: 5.65, h: 1.55, fontSize: 10.5, bold: true, lineSpacingMultiple: 1.25 });
-  T(s, "※ 500区画の合計（168,670.31）は、保存した帯平均×500 で逆算した値", { x: 0.8, y: 6.42, w: 5.65, h: 0.3, fontSize: 8.5, color: "CADCFC" });
+    ["帯の平均：y_{k} ＝ (1/500) Σ_{(p,q)∈帯k} G_{p,q}", { color: C.white }],
+    ["Σ_{(p,q)∈帯k}：帯kに入る500区画の G を全部足す", { color: "CADCFC", fontSize: 9.5, bold: false }],
+    ["帯1に代入：y_{1} ＝ 168,670.31 ÷ 500 ＝ 337.34 kWh/m²", { color: C.orange }],
+    ["全体平均：ȳ ＝ (1/5) Σ_{k=1}^{5} y_{k}（帯1〜5を足して5で割る）", { color: C.white }],
+    ["＝ (337.34＋351.22＋382.57＋485.55＋867.14) / 5 ＝ 484.76", { color: C.orange }],
+  ]), { x: 0.8, y: 4.78, w: 5.65, h: 1.72, fontSize: 10.5, bold: true, lineSpacingMultiple: 1.15 });
+  T(s, "※ 500区画の合計（168,670.31）は、保存した帯平均×500 で逆算した値", { x: 0.8, y: 6.52, w: 5.65, h: 0.26, fontSize: 8.5, color: "CADCFC" });
 
   T(s, "16配置ぶんでは、何を何個数えているか", { x: 6.95, y: 1.62, w: 5.9, h: 0.3, fontSize: 12, bold: true, color: C.navy });
   table(s, [
@@ -333,22 +334,43 @@ function story(s, idx) {
 // P5-3: 補間の計算（式と代入を1枚に）
 // =====================================================================
 {
-  const s = std(next(), 5, "補間の計算：入力を囲む4配置の値を、近さの割合で混ぜる", "例：A＝55.9m・D＝14m。重みは学習した係数ではなく、入力の位置から毎回計算する割合。中央建物は高さ50mのまま。");
-  const st = [
-    ["入力を囲む4配置を探す", "A_{0} ≤ A < A_{1}，D_{0} ≤ D < D_{1}", "50 ≤ 55.9 < 75，10 ≤ 14 < 25 → (50,10)(75,10)(50,25)(75,25)"],
-    ["区間の中の位置を割合で表す", "u ＝ (A−A_{0})/(A_{1}−A_{0})，v ＝ (D−D_{0})/(D_{1}−D_{0})", "u ＝ (55.9−50)/25 ＝ 0.236，v ＝ (14−10)/15 ＝ 0.267"],
-    ["4配置の重みを求める（合計1）", "w_{1}＝(1−u)(1−v)，w_{2}＝u(1−v)，w_{3}＝(1−u)v，w_{4}＝uv", "0.560，0.173，0.204，0.063 → 近い(50,10)ほど大きい"],
-    ["帯ごとに重みを掛けて足す", "ŷ_{k} ＝ Σ_{c=1}^{4} w_{c} × y_{k}(隅c)", "帯1：0.560×337.34＋0.173×319.89＋0.204×589.57＋0.063×535.49＝398.18"],
-    ["南面全体の平均", "ŷ_{平均} ＝ (ŷ_{1}＋…＋ŷ_{5}) / 5", "(398.18＋416.13＋449.40＋548.25＋794.48) / 5 ＝ 521.29"],
-  ];
-  st.forEach((t, i) => {
-    const y = 1.62 + i * 1.06;
-    R(s, 0.5, y, 7.0, 0.97, i % 2 ? C.white : C.panel, { round: true, rr: 0.05, line: "E1E5EA" });
-    circleNum(s, 0.62, y + 0.1, i + 1, C.teal, 0.32, 11);
-    T(s, t[0], { x: 1.05, y: y + 0.06, w: 6.3, h: 0.28, fontSize: 11, bold: true, color: C.navy });
-    T(s, [{ text: "式　", options: { color: C.muted, fontSize: 9 } }, ...M(t[1], { color: C.navy })], { x: 1.05, y: y + 0.36, w: 6.35, h: 0.28, fontSize: 11, bold: true });
-    T(s, [{ text: "代入 ", options: { color: C.muted, fontSize: 9 } }, { text: t[2], options: { color: C.dorange } }], { x: 1.05, y: y + 0.64, w: 6.4, h: 0.28, fontSize: i === 3 ? 8.5 : 10, bold: true });
-  });
+  const s = std(next(), 5, "補間の計算：入力を囲む4配置の値を、近さの割合（重み）で混ぜる", "例：A＝55.9m・D＝14m を入力した場合。重みは学習した係数ではなく、入力の位置から毎回計算する割合。中央建物は高さ50mのまま。");
+  const hl = { bold: true, color: C.dorange, fill: { color: C.peach } };
+  // 左：重みを決める
+  R(s, 0.5, 1.62, 6.0, 5.28, C.panel, { round: true, rr: 0.06 });
+  T(s, "ステップ1〜3：重みを決める", { x: 0.65, y: 1.68, w: 5.7, h: 0.3, fontSize: 12, bold: true, color: C.navy });
+  circleNum(s, 0.65, 2.08, 1, C.teal, 0.3, 11);
+  T(s, "入力を囲む計算済みの4配置（4隅）を探す", { x: 1.05, y: 2.06, w: 5.35, h: 0.28, fontSize: 11, bold: true, color: C.navy });
+  T(s, "50 ≤ 55.9 < 75，10 ≤ 14 < 25 → (50,10)(75,10)(50,25)(75,25)", { x: 1.05, y: 2.36, w: 5.35, h: 0.26, fontSize: 10, bold: true, color: C.dorange });
+  circleNum(s, 0.65, 2.78, 2, C.teal, 0.3, 11);
+  T(s, "区間の中のどこにいるかを割合で表す", { x: 1.05, y: 2.76, w: 5.35, h: 0.28, fontSize: 11, bold: true, color: C.navy });
+  T(s, ML([
+    "u ＝ (A − A_{0}) / (A_{1} − A_{0}) ＝ (55.9 − 50) / 25 ＝ 0.236",
+    "v ＝ (D − D_{0}) / (D_{1} − D_{0}) ＝ (14 − 10) / 15 ＝ 0.267",
+  ]), { x: 1.05, y: 3.05, w: 5.35, h: 0.5, fontSize: 10, bold: true, color: C.navy });
+  T(s, "u：50m→75m へ23.6%進んだ位置　v：10m→25m へ26.7%進んだ位置", { x: 1.05, y: 3.55, w: 5.35, h: 0.24, fontSize: 9, color: C.muted });
+  circleNum(s, 0.65, 3.92, 3, C.teal, 0.3, 11);
+  T(s, "重み ＝ 高さ方向の割合 × 距離方向の割合", { x: 1.05, y: 3.9, w: 5.35, h: 0.28, fontSize: 11, bold: true, color: C.navy });
+  table(s, [
+    ["重み：隅 (A, D)", "高さ方向", "距離方向", "重み"],
+    ["w_{1}：(50, 10)", "1−u ＝ 0.764", "1−v ＝ 0.733", { t: "0.560", o: hl }],
+    ["w_{2}：(75, 10)", "u ＝ 0.236", "1−v ＝ 0.733", { t: "0.173", o: { bold: true } }],
+    ["w_{3}：(50, 25)", "1−u ＝ 0.764", "v ＝ 0.267", { t: "0.204", o: { bold: true } }],
+    ["w_{4}：(75, 25)", "u ＝ 0.236", "v ＝ 0.267", { t: "0.063", o: { bold: true } }],
+    [{ t: "合計", o: { bold: true } }, "", "", { t: "1", o: { bold: true } }],
+  ], { x: 1.05, y: 4.22, w: 5.3, colW: [1.5, 1.3, 1.3, 1.2], rowH: 0.3, fs: 9.5, math: true, boldCol0: true });
+  T(s, "入力に一番近い (50,10) の重みが最大。入力が隅にぴったり重なると、その隅の重みが1になり、保存値そのものになる。", { x: 0.65, y: 6.1, w: 5.75, h: 0.72, fontSize: 9.5, color: C.text });
+
+  // 右：重みで混ぜる
+  R(s, 6.75, 1.62, 6.1, 5.28, C.white, { round: true, rr: 0.06, line: "DCE1E7" });
+  T(s, "ステップ4〜5：重みで混ぜる", { x: 6.9, y: 1.68, w: 5.8, h: 0.3, fontSize: 12, bold: true, color: C.navy });
+  R(s, 6.9, 2.05, 5.8, 0.95, C.navy, { round: true, rr: 0.05 });
+  T(s, M("ŷ_{k} ＝ Σ_{c=1}^{4} w_{c} × y_{k}(A_{c}, D_{c})"), { x: 7.0, y: 2.08, w: 5.6, h: 0.44, fontSize: 14, bold: true, color: C.white, align: "center", valign: "middle" });
+  T(s, M("Σ_{c=1}^{4}：c に 1, 2, 3, 4 を順に入れて足す（4隅の「重み×保存値」の合計）"), { x: 7.0, y: 2.52, w: 5.6, h: 0.42, fontSize: 9.5, color: "CADCFC", align: "center", valign: "middle" });
+  T(s, ML([
+    "帯1：ŷ_{1} ＝ 0.560×337.34 ＋ 0.173×319.89",
+    ["　　　　 ＋ 0.204×589.57 ＋ 0.063×535.49 ＝ 398.18", { color: C.dorange }],
+  ]), { x: 6.9, y: 3.08, w: 5.8, h: 0.55, fontSize: 10.5, bold: true, color: C.navy });
   const vals = [
     ["0〜10m", 337.34, 319.89, 589.57, 535.49, 398.18],
     ["10〜20m", 351.22, 320.20, 631.33, 561.20, 416.13],
@@ -356,21 +378,15 @@ function story(s, idx) {
     ["30〜40m", 485.55, 348.50, 873.24, 603.63, 548.25],
     ["40〜50m", 867.14, 357.95, 1006.93, 660.25, 794.48],
   ];
-  const hl = { bold: true, color: C.dorange, fill: { color: C.peach } };
-  T(s, "保存値（kWh/m²）と予測結果", { x: 7.75, y: 1.62, w: 5.1, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
   table(s, [
-    ["帯", "(50,10)", "(75,10)", "(50,25)", "(75,25)", "予測"],
+    ["帯 k", "(50,10)", "(75,10)", "(50,25)", "(75,25)", "予測"],
     [{ t: "重み", o: { bold: true, color: C.teal } }, ...["0.560", "0.173", "0.204", "0.063"].map(t => ({ t, o: { bold: true, color: C.teal } })), { t: "合計1", o: { color: C.teal } }],
     ...vals.map(r => [r[0], ...r.slice(1, 5).map(x => x.toFixed(2)), { t: r[5].toFixed(2), o: hl }]),
     [{ t: "平均", o: { bold: true } }, "", "", "", "", { t: "521.29", o: hl }],
-  ], { x: 7.75, y: 1.98, w: 5.1, colW: [0.85, 0.83, 0.83, 0.83, 0.83, 0.93], rowH: 0.34, fs: 9.5, boldCol0: true });
-  box(s, 7.75, 4.9, 5.1, 2.0, "読み方の注意", null, { fill: C.peach, tcolor: C.dorange, tfs: 11 });
-  T(s, bullets([
-    "5帯とも同じ4つの重みを使い、掛ける保存値だけを変える",
-    "保存データと式からの計算値。この条件でSEBEは実行していないので、この入力での誤差は不明",
-    "局所改良版は A 25〜50m 用なので、A＝55.9m では広範囲版を使う",
-  ], { gap: 3 }), { x: 7.9, y: 5.28, w: 4.85, h: 1.58, fontSize: 9.5 });
-  s.addNotes("補間の計算は5段階です。入力を囲む4配置を探し、区間の中の位置uとvを求め、4配置の重みを掛け算で求めます。重みの合計は1で、近い配置ほど大きくなります。帯ごとに保存値と重みを掛けて足すと予測値になり、帯1は398.18です。5帯の平均521.29が南面全体の平均です。");
+  ], { x: 6.9, y: 3.72, w: 5.8, colW: [0.9, 0.95, 0.95, 0.95, 0.95, 1.1], rowH: 0.3, fs: 9.5, boldCol0: true });
+  T(s, "⑤ 南面全体の平均 ＝ 5帯の平均 ＝ 521.29 kWh/m²", { x: 6.9, y: 6.2, w: 5.8, h: 0.28, fontSize: 10.5, bold: true, color: C.navy });
+  T(s, "この条件ではSEBEを実行していないので、この値の誤差は分からない。局所改良版は A 25〜50m 用なので使えない。", { x: 6.9, y: 6.48, w: 5.8, h: 0.4, fontSize: 8.5, color: C.muted });
+  s.addNotes("");
 }
 
 // =====================================================================
@@ -392,13 +408,14 @@ function story(s, idx) {
     ["平均誤差率", "(100/N) Σ_{j=1}^{N} |ŷ_{j} − y_{j}| / y_{j}", "検証8配置：2.67 %"],
   ];
   fm.forEach((f, i) => {
-    const y = 2.6 + i * 0.86;
-    R(s, 0.5, y, 7.0, 0.78, i % 2 ? C.white : C.panel, { round: true, rr: 0.05, line: "E1E5EA" });
-    T(s, f[0], { x: 0.62, y: y + 0.05, w: 1.9, h: 0.68, fontSize: 10.5, bold: true, color: C.teal, valign: "middle" });
-    T(s, M(f[1]), { x: 2.55, y: y + 0.06, w: 4.9, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
-    T(s, M(f[2]), { x: 2.55, y: y + 0.4, w: 4.9, h: 0.3, fontSize: 10, bold: true, color: C.dorange });
+    const y = 2.6 + i * 0.78;
+    R(s, 0.5, y, 7.0, 0.72, i % 2 ? C.white : C.panel, { round: true, rr: 0.05, line: "E1E5EA" });
+    T(s, f[0], { x: 0.62, y: y + 0.05, w: 1.9, h: 0.62, fontSize: 10.5, bold: true, color: C.teal, valign: "middle" });
+    T(s, M(f[1]), { x: 2.55, y: y + 0.04, w: 4.9, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
+    T(s, M(f[2]), { x: 2.55, y: y + 0.37, w: 4.9, h: 0.3, fontSize: 10, bold: true, color: C.dorange });
   });
-  T(s, "※ 8件の絶対誤差の合計 159.92 は MAE 19.99 × 8 で逆算した値", { x: 0.5, y: 6.9 - 0.02, w: 7, h: 0.2, fontSize: 8, color: C.muted });
+  T(s, M("Σ_{j=1}^{N}：1件目から N 件目までを順に足す記号（N＝比べた値の数）"), { x: 0.5, y: 6.47, w: 7, h: 0.26, fontSize: 9.5, bold: true, color: C.teal });
+  T(s, "※ 8件の絶対誤差の合計 159.92 は MAE 19.99 × 8 で逆算した値", { x: 0.5, y: 6.73, w: 7, h: 0.2, fontSize: 8, color: C.muted });
   table(s, [
     ["評価の目的", "使ったデータ", "N", "結果"],
     ["手法の比較（検証）", "検証8配置・全体平均", "8", "MAE 19.99・2.67%"],
@@ -658,7 +675,7 @@ function story(s, idx) {
   // 下左：スイッチ
   R(s, 0.5, 4.2, 6.0, 2.7, C.panel, { round: true, rr: 0.06 });
   T(s, "そこで s を使う（入力の例）", { x: 0.65, y: 4.26, w: 5.7, h: 0.28, fontSize: 11.5, bold: true, color: C.navy });
-  const rowsS = [["北", 0, "—", "—"], ["東", 1, "40 m", "30 m"], ["南", 1, "55.9 m", "14 m"], ["西", 0, "—", "—"]];
+  const rowsS = [["北", 0, "—", "—"], ["東", 1, "40 m", "20 m"], ["南", 1, "55.9 m", "14 m"], ["西", 0, "—", "—"]];
   ["方向", "s", "高さ A", "隙間 D", "計算に"].forEach((h, i) => T(s, h, { x: [0.7, 1.55, 2.85, 3.75, 4.75][i], y: 4.55, w: [0.6, 1.2, 0.85, 0.85, 1.5][i], h: 0.24, fontSize: 9, bold: true, color: C.muted, align: i ? "center" : "left" }));
   rowsS.forEach((r, j) => {
     const y = 4.82 + j * 0.5, on = r[1] === 1;
@@ -733,82 +750,98 @@ function story(s, idx) {
 }
 
 // =====================================================================
-// P7-1: 全部を計算するのは無理
+// P7-1: なぜ6,561通りか
 // =====================================================================
 {
-  const s = std(next(), 7, "4方向で線形補間をそのまま使うと、計算する配置が掛け算で増える");
+  const s = std(next(), 7, "なぜ4方向だと6,561通り？：各方向の選び方を掛け算するから");
   story(s, 0);
-  // 左：南1棟
-  R(s, 0.5, 1.7, 4.7, 5.2, C.panel, { round: true, rr: 0.06 });
-  T(s, "南1棟（今回できたこと）", { x: 0.65, y: 1.76, w: 4.4, h: 0.3, fontSize: 12, bold: true, color: C.navy });
-  T(s, "高さ3通り × 距離3通り ＝ 9配置", { x: 0.65, y: 2.08, w: 4.4, h: 0.28, fontSize: 10.5, bold: true, color: C.dorange });
-  const gx = 1.45, gy = 2.55, gs = 2.9;
+  R(s, 0.5, 1.7, 6.1, 5.2, C.panel, { round: true, rr: 0.06 });
+  T(s, "組み合わせの数え方", { x: 0.65, y: 1.76, w: 5.8, h: 0.3, fontSize: 12, bold: true, color: C.navy });
+  // 1方向＝9通り
+  const gx = 0.85, gy = 2.15, gs = 0.8;
   R(s, gx, gy, gs, gs, C.white, { line: "C9D0D8" });
-  const P = i => gx + 0.3 + i * (gs - 0.6) / 2;
-  const Q = j => gy + gs - 0.3 - j * (gs - 0.6) / 2;
-  R(s, P(0), Q(1), P(1) - P(0), Q(0) - Q(1), C.peach);
-  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) dot(s, P(i), Q(j), 0.2, (i <= 1 && j <= 1) ? C.orange : C.navy, "RECTANGLE");
-  dot(s, P(0) + 0.4, Q(0) - 0.45, 0.24, C.red, "STAR_5_POINT");
-  T(s, "距離 D →", { x: gx, y: gy + gs + 0.03, w: gs, h: 0.24, fontSize: 9, color: C.muted, align: "center" });
-  T(s, "高さ A ↑", { x: 0.6, y: gy + gs / 2 - 0.12, w: 0.85, h: 0.24, fontSize: 9, color: C.muted });
-  T(s, "★入力　■計算済み　■入力を囲む4点", { x: 0.65, y: 5.8, w: 4.4, h: 0.24, fontSize: 8.5, color: C.muted });
-  T(s, "表の点を全部SEBEで計算してあるので、どこに入力しても周りの4点がそろう → 補間できる", { x: 0.65, y: 6.08, w: 4.4, h: 0.75, fontSize: 10, bold: true, color: C.teal });
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) dot(s, gx + 0.15 + i * 0.25, gy + gs - 0.15 - j * 0.25, 0.11, C.navy, "RECTANGLE");
+  T(s, [{ text: "1方向の選び方 ＝ ", options: { color: C.navy } }, { text: "9通り", options: { color: C.dorange } }], { x: 1.8, y: 2.1, w: 4.7, h: 0.32, fontSize: 13, bold: true });
+  T(s, "高さ3通り（25・50・100m）× 距離3通り（10・25・100m）", { x: 1.8, y: 2.44, w: 4.7, h: 0.26, fontSize: 10, color: C.text });
+  T(s, "南1棟で表を作ったときと同じ考え方", { x: 1.8, y: 2.7, w: 4.7, h: 0.26, fontSize: 9.5, color: C.muted });
+  // 掛け算の鎖
+  const chain = [[[1, 0, 0, 0], "北だけ", "9"], [[1, 1, 0, 0], "北＋東", "81"], [[1, 1, 1, 0], "北＋東＋南", "729"], [[1, 1, 1, 1], "4方向すべて", "6,561"]];
+  chain.forEach((c, i) => {
+    const x = 0.7 + i * 1.47, y = 3.15;
+    R(s, x, y, 1.2, 1.35, C.white, { round: true, rr: 0.06, line: "DCE1E7" });
+    miniPlan(s, x + 0.6, y + 0.36, 0.13, c[0], { gap: 0.035 });
+    T(s, c[1], { x, y: y + 0.68, w: 1.2, h: 0.22, fontSize: 9, bold: true, color: C.navy, align: "center" });
+    T(s, c[2], { x, y: y + 0.9, w: 1.2, h: 0.38, fontSize: 16, bold: true, color: i === 3 ? C.red : C.dorange, align: "center" });
+    if (i < 3) T(s, "×9", { x: x + 1.19, y: y + 0.5, w: 0.3, h: 0.3, fontSize: 11, bold: true, color: C.navy, align: "center", margin: 0 });
+  });
+  T(s, "1方向増えるごとに9倍：9 → 81 → 729 → 6,561（＝9×9×9×9）", { x: 0.7, y: 4.57, w: 5.8, h: 0.26, fontSize: 10, bold: true, color: C.navy });
+  T(s, "例：北（高さ50m・距離25m）＋東（25m・10m）＋南（100m・100m）＋西（50m・10m）で、やっと「1通り」", { x: 0.7, y: 4.86, w: 5.8, h: 0.48, fontSize: 9.5, color: C.text });
+  R(s, 0.65, 5.42, 5.8, 1.35, C.peach, { round: true, rr: 0.06 });
+  T(s, "たとえると：4桁の暗証番号", { x: 0.8, y: 5.47, w: 5.5, h: 0.28, fontSize: 11, bold: true, color: C.dorange });
+  T(s, "各桁が0〜9の10通り → 10×10×10×10＝10,000通り。4方向＝4桁。各方向は「建物なし＋9通り＝10通り」なので、建物なしも含めると 10⁴＝10,000配置になる。", { x: 0.8, y: 5.77, w: 5.55, h: 0.95, fontSize: 9.5, color: C.text });
 
-  // 右：4方向の掛け算
-  T(s, "4方向（北・東・南・西に1棟ずつ置ける）", { x: 5.45, y: 1.72, w: 7.4, h: 0.3, fontSize: 12, bold: true, color: C.navy });
-  const dirs = ["北", "東", "南", "西"];
-  dirs.forEach((d, i) => {
-    const x = 5.45 + i * 1.88;
-    R(s, x, 2.1, 1.5, 1.45, C.panel, { round: true, rr: 0.06 });
-    miniPlan(s, x + 0.75, 2.62, 0.2, [0, 1, 2, 3].map(k => (k === i ? 1 : 0)), { gap: 0.05 });
-    T(s, `${d}の建物`, { x, y: 2.98, w: 1.5, h: 0.24, fontSize: 9.5, bold: true, color: C.navy, align: "center" });
-    T(s, "9通り", { x, y: 3.2, w: 1.5, h: 0.3, fontSize: 13, bold: true, color: C.dorange, align: "center" });
-    if (i < 3) T(s, "×", { x: x + 1.5, y: 2.55, w: 0.38, h: 0.5, fontSize: 20, bold: true, color: C.navy, align: "center" });
-  });
-  T(s, "各方向で「高さ3通り×距離3通り＝9通り」。4方向を同時に変えると、組み合わせは 9×9×9×9 になる。", { x: 5.45, y: 3.62, w: 7.4, h: 0.3, fontSize: 9.5, color: C.text });
-  const rows = [["南だけ（今回）", "9", 9], ["2棟を同時に変える", "9×9 ＝ 81", 81], ["3棟を同時に変える", "9×9×9 ＝ 729", 729], ["4棟を同時に変える", "9⁴ ＝ 6,561", 6561]];
-  rows.forEach((r, i) => {
-    const y = 4.02 + i * 0.44;
-    R(s, 5.45, y, 7.4, 0.4, i % 2 ? C.white : C.panel);
-    T(s, r[0], { x: 5.55, y, w: 1.9, h: 0.4, fontSize: 10, bold: true, color: C.navy, valign: "middle" });
-    T(s, r[1], { x: 7.45, y, w: 1.55, h: 0.4, fontSize: 10.5, bold: true, color: i === 3 ? C.dorange : C.navy, valign: "middle" });
-    const bw = Math.log10(r[2]) / Math.log10(10000) * 2.6;
-    R(s, 9.1, y + 0.1, bw, 0.2, i === 3 ? C.dorange : C.orange);
-    T(s, `${r[2].toLocaleString()}配置`, { x: 9.15 + bw, y, w: 1.2, h: 0.4, fontSize: 9, color: C.muted, valign: "middle" });
-  });
-  T(s, "棒の長さは対数目盛", { x: 9.1, y: 5.78, w: 3, h: 0.2, fontSize: 8, color: C.muted });
-  R(s, 5.45, 6.05, 7.4, 0.85, C.navy, { round: true, rr: 0.06 });
-  T(s, [{ text: "「建物なし」も入れると各方向10通り → 10⁴ ＝ 10,000配置。", options: { bold: true, color: C.orange, breakLine: true } }, { text: "表を全部埋めてから補間する方法は、SEBEの計算回数が多すぎて現実的でない。", options: { color: C.white } }], { x: 5.6, y: 6.08, w: 7.15, h: 0.8, fontSize: 10.5, valign: "middle" });
-  s.addNotes("南1棟では、高さ3通りと距離3通りの9配置で表が埋まり、どこに入力しても周りの4点がそろったので補間できました。4方向では各方向に9通りがあり、同時に変えると9×9×9×9で6,561配置になります。建物なしも入れると1万配置です。表を全部埋めてから補間する方法は現実的ではありません。これが「9点でできたなら4方向でも」という質問への答えです。");
+  // 右：全部計算したら
+  T(s, "では、6,561通りを全部SEBEで計算したら？", { x: 6.85, y: 1.72, w: 6, h: 0.3, fontSize: 12, bold: true, color: C.navy });
+  R(s, 6.85, 2.1, 6.0, 1.1, C.greenL, { round: true, rr: 0.06 });
+  T(s, "○ できること", { x: 7.0, y: 2.15, w: 5.7, h: 0.28, fontSize: 11, bold: true, color: C.green });
+  T(s, "南1棟と同じく、どこに入力しても周りに計算済みの点がそろうので、そのまま線形補間できる（一番確実な方法）", { x: 7.0, y: 2.45, w: 5.7, h: 0.7, fontSize: 10, color: C.text });
+  R(s, 6.85, 3.35, 6.0, 2.05, C.redL, { round: true, rr: 0.06 });
+  T(s, "× かかる手間", { x: 7.0, y: 3.4, w: 5.7, h: 0.28, fontSize: 11, bold: true, color: C.red });
+  T(s, [{ text: "SEBEの計算 ", options: { fontSize: 12, color: C.navy } }, { text: "6,561回", options: { fontSize: 24, color: C.red } }], { x: 7.0, y: 3.68, w: 5.7, h: 0.5, bold: true, valign: "middle" });
+  T(s, bullets([
+    "建物なしも含めると 10,000回",
+    "南1棟の研究全体で計算した 47配置の約140倍",
+    "仮に1回10分なら 6,561×10分 ≒ 1,090時間（休まず約46日）※10分は仮の値",
+  ], { gap: 2 }), { x: 7.0, y: 4.2, w: 5.7, h: 1.15, fontSize: 10 });
+  R(s, 6.85, 5.55, 6.0, 1.35, C.navy, { round: true, rr: 0.06 });
+  T(s, [
+    { text: "結論：6,561通りは「全部やるとこうなる」という見積もり。実際には計算しない。", options: { color: C.white, bold: true, breakLine: true } },
+    { text: "→ 各方向を分けて計算し、組み合わせは足し算で推定する（次のページ）", options: { color: C.orange, bold: true } },
+  ], { x: 7.0, y: 5.6, w: 5.7, h: 1.25, fontSize: 10.5, valign: "middle" });
+  s.addNotes("");
 }
 
 // =====================================================================
-// P7-2: 足し算で埋める
+// P7-2: 分けて考える（各方向9通り＋足し算）
 // =====================================================================
 {
-  const s = std(next(), 7, "そこで：1棟ずつの結果を足し算して、2棟以上の配置を推定する");
+  const s = std(next(), 7, "分けて考える：各方向9通りだけ計算し、組み合わせは足し算で推定する");
   story(s, 1);
-  // 左：10×10 表
-  R(s, 0.5, 1.7, 5.3, 5.2, C.panel, { round: true, rr: 0.06 });
-  T(s, "南と東の2方向で考えた表", { x: 0.65, y: 1.76, w: 5, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
-  const x0 = 1.45, y0 = 2.45, cs = 0.37;
-  T(s, "東の建物 → （なし＋9条件）", { x: x0, y: 2.08, w: 10 * cs, h: 0.24, fontSize: 9, bold: true, color: C.teal, align: "center" });
-  T(s, "南の\n建物\n↓", { x: 0.6, y: y0 + cs * 3.5, w: 0.75, h: 0.75, fontSize: 9, bold: true, color: C.dorange, align: "center" });
+  const steps = [
+    ["SEBEで計算するのは「1棟だけ」", "建物なし1 ＋ 各方向9通り×4方向 ＝ 37配置（6,561の約180分の1）"],
+    ["組み合わせは足し算で推定", "建物なしの値 − 各建物で減る量 ＝ 表の「?」を埋める"],
+    ["影の重なりでずれないか確かめる", "2〜4棟を同時に置いた配置をいくつかSEBEで計算し、足し算の結果と比べる"],
+  ];
+  steps.forEach((t, i) => {
+    const x = 0.5 + i * 4.18, w = 3.98;
+    R(s, x, 1.7, w, 1.05, i === 2 ? C.peach : C.panel, { round: true, rr: 0.06 });
+    circleNum(s, x + 0.12, 1.8, i + 1, C.orange, 0.34, 12);
+    T(s, `手順${i + 1}：${t[0]}`, { x: x + 0.55, y: 1.76, w: w - 0.62, h: 0.3, fontSize: 11, bold: true, color: C.navy });
+    T(s, t[1], { x: x + 0.55, y: 2.07, w: w - 0.62, h: 0.64, fontSize: 9.5, color: C.text });
+    if (i < 2) s.addShape(pres.shapes.RIGHT_ARROW, { x: x + w - 0.01, y: 2.07, w: 0.22, h: 0.3, fill: { color: C.orange }, line: { type: "none" } });
+  });
+  // 左：10×10表
+  R(s, 0.5, 2.9, 5.05, 4.0, C.panel, { round: true, rr: 0.06 });
+  T(s, "手順1で埋まるのは表の端だけ（南×東の例）", { x: 0.65, y: 2.95, w: 4.8, h: 0.28, fontSize: 10.5, bold: true, color: C.navy });
+  const x0 = 1.5, y0 = 3.55, cs = 0.28;
+  T(s, "東の建物 →（なし＋9通り）", { x: x0, y: 3.26, w: 10 * cs, h: 0.24, fontSize: 8.5, bold: true, color: C.teal, align: "center" });
+  T(s, "南の\n建物\n↓", { x: 0.62, y: y0 + cs * 3.3, w: 0.8, h: 0.75, fontSize: 8.5, bold: true, color: C.dorange, align: "center" });
   for (let r = 0; r < 10; r++) for (let c = 0; c < 10; c++) {
     const x = x0 + c * cs, y = y0 + r * cs;
     let fill = "E3E7EC";
     if (r === 0 && c === 0) fill = C.navy; else if (r === 0) fill = C.teal; else if (c === 0) fill = C.orange;
     R(s, x, y, cs - 0.03, cs - 0.03, fill);
-    if (r > 0 && c > 0) T(s, "?", { x, y, w: cs - 0.03, h: cs - 0.03, fontSize: 8, bold: true, color: "A8B0BA", align: "center", valign: "middle", margin: 0 });
+    if (r > 0 && c > 0) T(s, "?", { x, y, w: cs - 0.03, h: cs - 0.03, fontSize: 7.5, bold: true, color: "A8B0BA", align: "center", valign: "middle", margin: 0 });
   }
-  // 例のマスを強調
   R(s, x0 + 4 * cs, y0 + 3 * cs, cs - 0.03, cs - 0.03, C.red);
-  T(s, "例", { x: x0 + 4 * cs, y: y0 + 3 * cs, w: cs - 0.03, h: cs - 0.03, fontSize: 8, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+  T(s, "例", { x: x0 + 4 * cs, y: y0 + 3 * cs, w: cs - 0.03, h: cs - 0.03, fontSize: 7.5, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+  T(s, "SEBEで計算\n（端の19配置）", { x: 4.35, y: 3.6, w: 1.15, h: 0.5, fontSize: 8, bold: true, color: C.teal });
+  T(s, "足し算で推定\n（81配置）", { x: 4.35, y: 4.9, w: 1.15, h: 0.5, fontSize: 8, bold: true, color: C.muted });
   const lg = [[C.navy, "建物なし（1）"], [C.teal, "東だけ（9）"], [C.orange, "南だけ（9）"], ["E3E7EC", "南と東を同時（81）"]];
-  lg.forEach((l, i) => { R(s, 0.7 + (i % 2) * 2.5, 6.25 + Math.floor(i / 2) * 0.28, 0.17, 0.17, l[0]); T(s, l[1], { x: 0.92 + (i % 2) * 2.5, y: 6.19 + Math.floor(i / 2) * 0.28, w: 2.3, h: 0.26, fontSize: 9 }); });
+  lg.forEach((l, i) => { R(s, 0.7 + (i % 2) * 2.4, 6.44 + Math.floor(i / 2) * 0.22, 0.15, 0.15, l[0]); T(s, l[1], { x: 0.9 + (i % 2) * 2.4, y: 6.38 + Math.floor(i / 2) * 0.22, w: 2.2, h: 0.24, fontSize: 8.5 }); });
 
   // 右：足し算の例
-  T(s, "「?」の1マスを、端の値から足し算で出す（数値は説明用）", { x: 6.05, y: 1.72, w: 6.8, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
+  T(s, "手順2：「?」の1マスを足し算で出す（数値は説明用）", { x: 5.8, y: 2.92, w: 7, h: 0.28, fontSize: 10.5, bold: true, color: C.navy });
   const eqItems = [
     [[0, 1, 1, 0], "東と南の2棟", "？", C.red],
     [[0, 0, 0, 0], "建物なし", "1000", C.navy],
@@ -817,33 +850,32 @@ function story(s, idx) {
   ];
   const ops = ["≒", "−", "−"];
   eqItems.forEach((e, i) => {
-    const x = 6.05 + i * 1.72;
-    R(s, x, 2.1, 1.4, 1.75, C.panel, { round: true, rr: 0.06 });
-    miniPlan(s, x + 0.7, 2.62, 0.2, e[0], { gap: 0.05 });
-    T(s, e[1], { x, y: 3.0, w: 1.4, h: 0.26, fontSize: 9.5, bold: true, color: C.navy, align: "center" });
-    T(s, e[2], { x, y: 3.28, w: 1.4, h: 0.45, fontSize: 18, bold: true, color: e[3], align: "center" });
-    if (i < 3) T(s, ops[i], { x: x + 1.38, y: 2.7, w: 0.36, h: 0.5, fontSize: 20, bold: true, color: C.navy, align: "center" });
+    const x = 5.8 + i * 1.75;
+    R(s, x, 3.28, 1.45, 1.5, C.panel, { round: true, rr: 0.06 });
+    miniPlan(s, x + 0.72, 3.72, 0.18, e[0], { gap: 0.045 });
+    T(s, e[1], { x, y: 4.08, w: 1.45, h: 0.24, fontSize: 9.5, bold: true, color: C.navy, align: "center" });
+    T(s, e[2], { x, y: 4.32, w: 1.45, h: 0.42, fontSize: 17, bold: true, color: e[3], align: "center" });
+    if (i < 3) T(s, ops[i], { x: x + 1.45, y: 3.8, w: 0.3, h: 0.45, fontSize: 18, bold: true, color: C.navy, align: "center", margin: 0 });
   });
-  T(s, "＝ 600", { x: 6.05, y: 3.95, w: 6.8, h: 0.4, fontSize: 16, bold: true, color: C.red, align: "right" });
+  T(s, "＝ 600", { x: 5.8, y: 4.8, w: 7.05, h: 0.36, fontSize: 15, bold: true, color: C.red, align: "right" });
   table(s, [
-    ["「減る量」の求め方", "計算（説明用の数値）", "SEBEで必要な配置"],
-    ["南で減る量 ＝ 建物なし − 南だけ", "1000 − 700 ＝ 300", "南だけの配置（既存）"],
-    ["東で減る量 ＝ 建物なし − 東だけ", "1000 − 900 ＝ 100", "東だけの配置（新規）"],
-  ], { x: 6.05, y: 4.4, w: 6.8, colW: [2.75, 1.85, 2.2], rowH: 0.34, fs: 9.5, boldCol0: true });
-  R(s, 6.05, 5.55, 6.8, 1.35, C.navy, { round: true, rr: 0.06 });
+    ["「減る量」の求め方", "計算（説明用の数値）", "使うSEBEの結果"],
+    ["南で減る量 ＝ 建物なし − 南だけ", "1000 − 700 ＝ 300", "南だけの配置"],
+    ["東で減る量 ＝ 建物なし − 東だけ", "1000 − 900 ＝ 100", "東だけの配置"],
+  ], { x: 5.8, y: 5.2, w: 7.05, colW: [2.85, 1.95, 2.25], rowH: 0.3, fs: 9.5, boldCol0: true });
+  R(s, 5.8, 6.18, 7.05, 0.72, C.navy, { round: true, rr: 0.05 });
   T(s, [
-    { text: "計算するのは端（1棟だけ）の配置だけでよい → 1万配置の代わりに約65配置", options: { color: C.white, bold: true, breakLine: true } },
-    { text: "ただし仮定がある：", options: { color: C.orange, bold: true } },
-    { text: "「南で減る量」と「東で減る量」が互いに関係しない（別々の光を遮る）こと。2棟が同じ光を遮ると、この足し算はずれる → 次のページ", options: { color: "CADCFC" } },
-  ], { x: 6.2, y: 5.6, w: 6.55, h: 1.25, fontSize: 10, valign: "middle" });
-  s.addNotes("南と東の2方向で考えると、SEBEで計算するのは表の端、つまり1棟だけの配置です。2棟を同時に置いた?のマスは計算しません。?は、建物なしの値から、南で減る量と東で減る量を引いて推定します。例えば建物なしが1000、南だけが700なら南で減る量は300、東だけが900なら東で減る量は100で、2棟なら600と推定します。ただし、この足し算は、2棟の減る量が互いに関係しないという仮定の上に成り立っています。");
+    { text: "前提：", options: { color: C.orange, bold: true } },
+    { text: "この足し算は「2棟が別々の光を遮る」ときに正しい。同じ光を遮る（影の重なり）とずれる → 手順3で確かめる（次のページ）", options: { color: C.white } },
+  ], { x: 5.95, y: 6.2, w: 6.8, h: 0.68, fontSize: 9.5, valign: "middle" });
+  s.addNotes("");
 }
 
 // =====================================================================
 // P7-3: 足し算の弱点＝影の重なり
 // =====================================================================
 {
-  const s = std(next(), 7, "足し算の弱点：2棟が同じ光を遮ると、減る量を二重に引く");
+  const s = std(next(), 7, "ずれの原因＝影の重なり：2棟が同じ光を遮ると二重に引いてしまう");
   story(s, 2);
   // 平面の図
   R(s, 0.5, 1.7, 3.8, 3.05, C.panel, { round: true, rr: 0.06 });
@@ -886,117 +918,103 @@ function story(s, idx) {
     T(s, b[0], { x: x - 0.15, y: base + 0.02, w: 1.25, h: 0.22, fontSize: 8.5, bold: true, color: C.navy, align: "center" });
   });
   R(s, 7.3, 4.95, 5.55, 1.95, C.navy, { round: true, rr: 0.06 });
-  T(s, "なぜ影の重なりを考えるのか", { x: 7.5, y: 5.0, w: 5.2, h: 0.28, fontSize: 11, bold: true, color: C.orange });
+  T(s, "「影の重なりを考える」とは", { x: 7.5, y: 5.0, w: 5.2, h: 0.28, fontSize: 11.5, bold: true, color: C.orange });
   T(s, bullets([
-    { text: "足し算が正しいのは「2棟が別々の光を遮る」ときだけ → 重なりの大きさが、この方法を使えるかを決める" },
-    { text: "重なると減る量を引きすぎる → 日射量を低く予測（例：600 と 640）" },
-    { text: "SEBEは2棟を同時に置いて計算するので重なりが入る → 比べればずれが数値で分かる" },
-  ], { gap: 3 }), { x: 7.5, y: 5.3, w: 5.2, h: 1.55, fontSize: 9.5, color: C.white });
+    { text: "足し算の式には重なりが入っていない（1棟ずつの減る量をそのまま足す）" },
+    { text: "同じ光を二重に引くので、予測が低めにずれる（600 と 640）" },
+    { text: "重なりを含むSEBE（2〜4棟を同時に計算）と比べ、ずれの大きさを確かめる" },
+  ], { gap: 3 }), { x: 7.5, y: 5.32, w: 5.2, h: 1.55, fontSize: 10, color: C.white });
   s.addNotes("足し算の方法の弱点が影の重なりです。南面の点Pでは、朝は東の建物、昼前後は南の建物が光を遮ります。東だけなら3時間、南だけなら5時間当たらず、足し算では8時間ですが、9時から10時は両方が同じ光を遮っているので、実際は7時間です。同じ光は1回しか遮れないので、足し算では減る量を引きすぎ、日射量を低く予測します。つまり重なりが小さければ足し算の方法が使え、大きければ使えません。だから影の重なりを考える必要があります。数値は説明用の仮定です。");
 }
 
 // =====================================================================
-// P7-4: 足し算を式で書く
+// P7-4: 足し算の方法を式で書く（Σの説明つき）
 // =====================================================================
 {
-  const s = std(next(), 7, "足し算の方法を式で書く：3つのステップ（言葉 → 式 → 数値の順に読む）");
+  const s = std(next(), 7, "足し算の方法を式で書く（Σは「番号を順に入れて全部足す」記号）");
   story(s, 3);
-  const cols = [
-    {
-      t: "1棟で「減る量」を出す", tag: "SEBEの結果から",
-      word: "減る量 ＝ 建物なしの値 − その建物だけ置いた値",
-      eq: "ΔY^{(i)} ＝ Y^{0} − Y^{(i)}",
-      ex: ["ΔY^{(南)} ＝ 1000 − 700 ＝ 300", "ΔY^{(東)} ＝ 1000 − 900 ＝ 100"],
-      note: "格子点（計算した配置）ごとに求めておく",
-    },
-    {
-      t: "格子の間は、南と同じ補間", tag: "今のツールと同じ計算",
-      word: "入力が格子点でないときは、囲む4配置の「減る量」を重みで混ぜる",
-      eq: "ΔŶ^{(i)} ＝ Σ_{c=1}^{4} w_{c} × ΔY^{(i)}(隅c)",
-      ex: ["東 A＝40m・D＝30m → u＝0.6，v＝0.2", "重み 0.32，0.48，0.08，0.12（合計1）"],
-      note: "重みの求め方は補間の計算（p.22）と同じ",
-    },
-    {
-      t: "有る建物の分だけ引く", tag: "s を掛けて合計",
-      word: "予測 ＝ 建物なしの値 − 有る建物の減る量の合計",
-      eq: "Ŷ ＝ Y^{0} − Σ_{i} s_{i} × ΔŶ^{(i)}",
-      ex: ["1000 − 0×北 − 1×100 − 1×300 − 0×西", "＝ 600"],
-      note: "i は 北・東・南・西。無い建物は s＝0 で消える",
-    },
+  R(s, 0.5, 1.7, 12.35, 2.2, C.navy, { round: true, rr: 0.06 });
+  const rows = [
+    ["ΔY^{(i)}_{f,k}(A_{c}, D_{c}) ＝ Y^{0}_{f,k} − Y^{(i)}_{f,k}(A_{c}, D_{c})", "1棟で減る量：方向 i に1棟だけ置いた配置（格子点 c）で、面 f・帯 k の日射量が建物なしより減った量。SEBEの結果の引き算"],
+    ["ΔŶ^{(i)}_{f,k} ＝ Σ_{c=1}^{4} w_{c}(u_{i}, v_{i}) × ΔY^{(i)}_{f,k}(A_{c}, D_{c})", "格子の間を補間：入力 A_{i}・D_{i} を囲む4つの格子点の「減る量」を重み w で混ぜる（p.22 と同じ計算）"],
+    ["Ŷ_{f,k} ＝ Y^{0}_{f,k} − Σ_{i＝北,東,南,西} s_{i} × ΔŶ^{(i)}_{f,k}", "足し算：建物なしの値から、4方向の「減る量」に有無 s を掛けて全部引く（s＝0 の方向は消える）"],
   ];
-  cols.forEach((c, i) => {
-    const x = 0.5 + i * 4.18, w = 3.98, y = 1.7, h = 3.55;
-    R(s, x, y, w, h, C.panel, { round: true, rr: 0.06 });
-    circleNum(s, x + 0.15, y + 0.12, i + 1, C.orange, 0.36, 13);
-    T(s, c.t, { x: x + 0.6, y: y + 0.08, w: w - 0.7, h: 0.3, fontSize: 12, bold: true, color: C.navy });
-    T(s, c.tag, { x: x + 0.6, y: y + 0.36, w: w - 0.7, h: 0.22, fontSize: 8.5, color: C.muted });
-    T(s, [{ text: "言葉", options: { bold: true, color: C.teal, breakLine: true } }, { text: c.word, options: { color: C.text } }], { x: x + 0.15, y: y + 0.66, w: w - 0.3, h: 0.8, fontSize: 9.5 });
-    R(s, x + 0.15, y + 1.5, w - 0.3, 0.55, C.navy, { round: true, rr: 0.05 });
-    T(s, M(c.eq), { x: x + 0.2, y: y + 1.5, w: w - 0.4, h: 0.55, fontSize: 12, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
-    T(s, [{ text: "数値（説明用）", options: { bold: true, color: C.dorange, breakLine: true } }, ...ML(c.ex).map(r => ({ text: r.text, options: { ...r.options, bold: true, color: C.navy } }))], { x: x + 0.15, y: y + 2.12, w: w - 0.3, h: 0.9, fontSize: 10 });
-    T(s, c.note, { x: x + 0.15, y: y + 3.05, w: w - 0.3, h: 0.45, fontSize: 8.5, color: C.muted });
-    if (i < 2) s.addShape(pres.shapes.RIGHT_ARROW, { x: x + w - 0.02, y: y + 1.62, w: 0.22, h: 0.3, fill: { color: C.orange }, line: { type: "none" } });
+  rows.forEach((r, i) => {
+    const y = 1.78 + i * 0.7;
+    circleNum(s, 0.65, y + 0.12, i + 1, C.orange, 0.36, 13);
+    T(s, M(r[0]), { x: 1.1, y, w: 6.6, h: 0.6, fontSize: 12.5, bold: true, color: C.white, valign: "middle" });
+    T(s, M(r[1]), { x: 7.8, y, w: 4.95, h: 0.6, fontSize: 9.5, color: "CADCFC", valign: "middle" });
+    if (i < 2) line(s, 1.1, y + 0.66, 12.7, y + 0.66, { color: "3A4C6E", width: 0.5 });
   });
-  // 記号表
-  T(s, "記号の意味", { x: 0.5, y: 5.38, w: 3, h: 0.28, fontSize: 11, bold: true, color: C.navy });
+
+  T(s, "記号の読み方", { x: 0.5, y: 4.02, w: 5, h: 0.28, fontSize: 11.5, bold: true, color: C.navy });
   table(s, [
-    ["記号", "意味", "どこから来るか"],
-    ["Y^{0}", "周りに建物がないときの日射量", "SEBE（1配置）"],
-    ["Y^{(i)}", "方向 i に1棟だけ置いたときの日射量", "SEBE（各方向16配置）"],
-    ["ΔY，ΔŶ", "その建物で減る量（Ŷ は補間した値）", "①・②で計算"],
-    ["w_{c}，s_{i}", "補間の重み，建物の有無（0/1）", "入力から計算"],
-  ], { x: 0.5, y: 5.68, w: 7.6, colW: [1.2, 3.8, 2.6], rowH: 0.24, fs: 9, math: true, boldCol0: true });
-  R(s, 8.35, 5.38, 4.5, 1.52, C.peach, { round: true, rr: 0.06 });
-  T(s, bullets([
-    "この計算を 4面 × 5帯 ＝ 20個の値それぞれで行う（本来は式に面・帯の添字が付く）",
-    "南だけ置いた場合は、今の南1棟ツールと同じ答えになる（重みの合計が1のため）",
-  ], { gap: 4 }), { x: 8.5, y: 5.45, w: 4.25, h: 1.4, fontSize: 9.5 });
-  s.addNotes("足し算の方法を式にすると3ステップです。1つ目は、1棟だけ置いたSEBEの結果から、建物なしとの差として減る量を出します。2つ目は、入力が格子点でないときに、南と同じように4配置の減る量を重みで混ぜます。3つ目は、建物なしの値から、有る建物の減る量をsを掛けて引きます。前のページの例の1000−300−100=600が、そのまま式になっています。この計算を4面×5帯の20個それぞれで行います。");
+    ["記号", "意味"],
+    ["f，k", "面（北東南西）と帯（1〜5）。20個それぞれで同じ計算"],
+    ["i", "周囲の建物の方向（北・東・南・西）"],
+    ["c", "入力を囲む4つの格子点（4隅）の番号 1〜4"],
+    ["Σ_{c=1}^{4}", "c に 1, 2, 3, 4 を順に入れて足す（4隅ぶん）"],
+    ["Σ_{i}", "i に 北, 東, 南, 西 を順に入れて足す（4方向ぶん）"],
+    ["s_{i}，w_{c}", "建物の有無（1/0），補間の重み（p.22 の式）"],
+    ["Y^{0}，Y^{(i)}", "建物なし／方向 i に1棟だけのSEBE値（Ŷ は推定値）"],
+  ], { x: 0.5, y: 4.32, w: 5.85, colW: [1.25, 4.6], rowH: 0.3, fs: 9.5, math: true, boldCol0: true, align: ["center", "left"] });
+
+  R(s, 6.6, 4.02, 6.25, 2.88, C.panel, { round: true, rr: 0.06 });
+  T(s, "Σを展開した例：東と南に建物，南面・帯1（数値は説明用）", { x: 6.75, y: 4.08, w: 6.0, h: 0.28, fontSize: 10.5, bold: true, color: C.navy });
+  T(s, ML([
+    ["③の Σ_{i}：0×ΔŶ^{(北)} ＋ 1×ΔŶ^{(東)} ＋ 1×ΔŶ^{(南)} ＋ 0×ΔŶ^{(西)}", { color: C.navy }],
+    ["Ŷ_{南面,1} ＝ Y^{0} − ΔŶ^{(東)} − ΔŶ^{(南)} ＝ 1000 − 100 − 300 ＝ 600", { color: C.dorange }],
+    ["②の Σ_{c}：東 A＝40m・D＝20m → u＝0.6，v＝0.667", { color: C.navy }],
+    ["w＝(1−u)(1−v)＝0.133，u(1−v)＝0.200，(1−u)v＝0.267，uv＝0.400", { color: C.teal, fontSize: 9.5 }],
+    ["ΔŶ^{(東)} ＝ 0.133×ΔY(25,10) ＋ 0.200×ΔY(50,10)", { color: C.navy }],
+    ["　　　　 ＋ 0.267×ΔY(25,25) ＋ 0.400×ΔY(50,25)", { color: C.navy }],
+  ]), { x: 6.75, y: 4.4, w: 6.0, h: 2.0, fontSize: 10, bold: true, lineSpacingMultiple: 1.15 });
+  T(s, "南だけ置くと、③は今の南1棟ツールと同じ計算になる（重みの合計が1で Y⁰ が消えるため）", { x: 6.75, y: 6.42, w: 6.0, h: 0.42, fontSize: 9, color: C.muted });
+  s.addNotes("");
 }
 
 // =====================================================================
 // P7-5: 来週の確認
 // =====================================================================
 {
-  const s = std(next(), 7, "来週の確認：SEBEで65配置を計算し、足し算の誤差を数値で示す");
+  const s = std(next(), 7, "来週の確認：SEBEで計算し、足し算の誤差を数値で示す");
   story(s, 4);
-  T(s, "学習用（補間用）データ：1棟だけの配置", { x: 0.5, y: 1.7, w: 6, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
+  T(s, "手順1の学習用データ（1棟だけの配置）：2つの案", { x: 0.5, y: 1.7, w: 6.1, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
+  const em = { bold: true, color: C.dorange };
   table(s, [
-    ["種類", "配置", "数", "状況"],
-    ["建物なし", "周囲0棟", "1", "新規"],
-    ["南だけ", "A 25・50・75・100 × D 10・25・50・100", "16", { t: "既存", o: { color: C.green, bold: true } }],
-    ["東だけ", "同じ 4×4 格子", "16", "新規"],
-    ["北だけ", "同じ 4×4 格子", "16", "新規"],
-    ["西だけ", "同じ 4×4 格子", "16", "新規"],
-    [{ t: "合計", o: { bold: true } }, "", { t: "65", o: { bold: true, color: C.dorange } }, { t: "新規49", o: { bold: true, color: C.dorange } }],
-  ], { x: 0.5, y: 2.05, w: 6.1, colW: [0.95, 3.35, 0.6, 1.2], rowH: 0.3, fs: 9.5, boldCol0: true });
-  T(s, "時間が足りなければ各方向 3×3＝9配置に減らす案もある", { x: 0.5, y: 4.2, w: 6.1, h: 0.24, fontSize: 8.5, color: C.muted });
+    ["", "案A（第一候補）", "案B（時間が足りない場合）"],
+    ["各方向の格子", "4×4＝16通り（南と同じ）", "3×3＝9通り（p.29 と同じ）"],
+    ["建物なし", "1", "1"],
+    ["南だけ", "16（計算済み）", "9（計算済みから選ぶ）"],
+    ["東・北・西だけ", "16×3＝48", "9×3＝27"],
+    ["合計（うち新規）", { t: "65（49）", o: em }, { t: "37（28）", o: em }],
+    ["全部の組み合わせなら", "17⁴＝83,521", "10⁴＝10,000"],
+  ], { x: 0.5, y: 2.05, w: 6.1, colW: [1.6, 2.2, 2.3], rowH: 0.3, fs: 9.5, boldCol0: true });
+  T(s, "案Aは南の広範囲版と同じ細かさ（テスト誤差率2.42%を確認済み）。案Bは全範囲を3段階にするため、補間の誤差が大きくなる可能性がある。", { x: 0.5, y: 4.18, w: 6.1, h: 0.46, fontSize: 9, color: C.muted });
 
-  T(s, "テストデータ：学習に使わない配置（先に決めて固定）", { x: 6.85, y: 1.7, w: 6, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
+  T(s, "手順3の確認用データ（テスト）：先に決めて固定", { x: 6.85, y: 1.7, w: 6, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
   R(s, 6.85, 2.05, 6.0, 0.95, C.tealL, { round: true, rr: 0.06 });
-  T(s, [{ text: "テストA：1棟だけ（東・北・西 各2）6配置", options: { bold: true, color: C.teal, breakLine: true } }, { text: "→ ② の補間そのものの誤差（南で確かめたことが他の方向でも言えるか）", options: {} }], { x: 7.0, y: 2.1, w: 5.75, h: 0.85, fontSize: 9.5, valign: "middle" });
+  T(s, [{ text: "テストA：1棟だけ（東・北・西 各2）6配置", options: { bold: true, color: C.teal, breakLine: true } }, { text: "→ 補間そのものの誤差（南で確かめたことが、他の方向でも言えるか）", options: {} }], { x: 7.0, y: 2.1, w: 5.75, h: 0.85, fontSize: 10, valign: "middle" });
   R(s, 6.85, 3.1, 6.0, 1.1, C.peach, { round: true, rr: 0.06 });
-  T(s, [{ text: "テストB：2〜4棟を同時に置く 12配置（2棟6・3棟3・4棟3）", options: { bold: true, color: C.dorange, breakLine: true } }, { text: "→ ③ の足し算の誤差＝影の重なりの影響。A・D は格子点と重ならない値を乱数で選ぶ", options: {} }], { x: 7.0, y: 3.15, w: 5.75, h: 1.0, fontSize: 9.5, valign: "middle" });
+  T(s, [{ text: "テストB：2〜4棟を同時に置く 12配置（2棟6・3棟3・4棟3）", options: { bold: true, color: C.dorange, breakLine: true } }, { text: "→ 足し算の誤差＝影の重なりの影響。A・D は格子点と重ならない値を乱数で選ぶ", options: {} }], { x: 7.0, y: 3.15, w: 5.75, h: 1.0, fontSize: 10, valign: "middle" });
 
-  // 結果表（空欄）
-  T(s, "来週埋める表（今は空欄）", { x: 0.5, y: 4.5, w: 6, h: 0.28, fontSize: 11.5, bold: true, color: C.navy });
+  T(s, "来週埋める表（今は空欄）", { x: 0.5, y: 4.7, w: 6, h: 0.28, fontSize: 11.5, bold: true, color: C.navy });
   const blank = { t: "来週", o: { color: C.faint } };
   table(s, [
     ["", "1棟（テストA）", "2棟", "3棟", "4棟"],
     ["MAE（kWh/m²）", blank, blank, blank, blank],
     ["平均誤差率", blank, blank, blank, blank],
     ["最大誤差率", blank, blank, blank, blank],
-  ], { x: 0.5, y: 4.82, w: 6.1, colW: [1.7, 1.25, 1.05, 1.05, 1.05], rowH: 0.36, fs: 9.5, boldCol0: true });
-  T(s, "参考：南1棟のテスト12配置は MAE 18.40・2.42%", { x: 0.5, y: 6.3, w: 6.1, h: 0.24, fontSize: 8.5, color: C.muted });
+  ], { x: 0.5, y: 5.0, w: 6.1, colW: [1.7, 1.25, 1.05, 1.05, 1.05], rowH: 0.33, fs: 9.5, boldCol0: true });
+  T(s, "参考：南1棟のテスト12配置は MAE 18.40・誤差率2.42%", { x: 0.5, y: 6.36, w: 6.1, h: 0.22, fontSize: 8.5, color: C.muted });
+  T(s, "判断の基準（例：誤差率○%以内）は、結果を見る前に先生と決めたい", { x: 0.5, y: 6.6, w: 6.1, h: 0.28, fontSize: 9.5, bold: true, color: C.dorange });
 
-  // 判断
-  T(s, "結果の読み方と次の一手", { x: 6.85, y: 4.5, w: 6, h: 0.28, fontSize: 11.5, bold: true, color: C.navy });
-  R(s, 6.85, 4.82, 6.0, 0.95, C.greenL, { round: true, rr: 0.06 });
-  T(s, [{ text: "棟数が増えても誤差がほぼ同じ", options: { bold: true, color: C.green, breakLine: true } }, { text: "→ 重なりは小さい。4方向版は「補間＋足し算」で作る", options: {} }], { x: 7.0, y: 4.86, w: 5.75, h: 0.88, fontSize: 9.5, valign: "middle" });
-  R(s, 6.85, 5.87, 6.0, 1.03, C.redL, { round: true, rr: 0.06 });
-  T(s, [{ text: "棟数とともに誤差が大きくなる", options: { bold: true, color: C.red, breakLine: true } }, { text: "→ 重なりが効いている。重なりの補正を加えるか、代案「空の遮られ方」へ", options: {} }], { x: 7.0, y: 5.9, w: 5.75, h: 0.97, fontSize: 9.5, valign: "middle" });
-  T(s, "判断の基準（例：誤差率○%以内）は結果を見る前に先生と決めたい", { x: 0.5, y: 6.58, w: 6.1, h: 0.3, fontSize: 9.5, bold: true, color: C.dorange });
-  s.addNotes("来週はSEBEで学習用の65配置を計算します。南の16配置は既存なので新規は49配置です。テストは2種類で、1棟だけの6配置で補間そのものの誤差を、2〜4棟を同時に置く12配置で足し算の誤差、つまり影の重なりの影響を見ます。棟数ごとに誤差を並べ、棟数が増えても誤差が変わらなければ足し算の方法で4方向版を作り、大きくなれば重なりの補正か代案へ進みます。判断の基準は結果を見る前に決めたいです。");
+  T(s, "結果の読み方と次の一手", { x: 6.85, y: 4.7, w: 6, h: 0.28, fontSize: 11.5, bold: true, color: C.navy });
+  R(s, 6.85, 5.0, 6.0, 0.88, C.greenL, { round: true, rr: 0.06 });
+  T(s, [{ text: "棟数が増えても誤差がほぼ同じ", options: { bold: true, color: C.green, breakLine: true } }, { text: "→ 重なりは小さい。4方向版は「分けて計算＋足し算」で作る", options: {} }], { x: 7.0, y: 5.03, w: 5.75, h: 0.82, fontSize: 10, valign: "middle" });
+  R(s, 6.85, 5.98, 6.0, 0.92, C.redL, { round: true, rr: 0.06 });
+  T(s, [{ text: "棟数とともに誤差が大きくなる", options: { bold: true, color: C.red, breakLine: true } }, { text: "→ 重なりが効いている。重なりの補正を加えるか、代案「空の遮られ方」へ", options: {} }], { x: 7.0, y: 6.01, w: 5.75, h: 0.86, fontSize: 10, valign: "middle" });
+  s.addNotes("");
 }
 
 // =====================================================================
@@ -1076,21 +1094,22 @@ function story(s, idx) {
   R(s, 0.5, 3.1, 6.2, 3.8, C.panel, { round: true, rr: 0.06 });
   T(s, "想定している計算（前ページの点Pの値）", { x: 0.65, y: 3.16, w: 5.9, h: 0.28, fontSize: 11.5, bold: true, color: C.navy });
   const eqs = [
-    ["方向 j の遮蔽高度角", "h_{j} ＝ max_{i} arctan( (A_{i} − z) / d_{ij} )", "正面：arctan(15/25) ＝ 31°，30°方向：27.5°"],
-    ["方向 j がふさがれているか", "b_{j} ＝ 1（ふさがれている）／ 0（見える）", "マスの高度 ＜ h_{j} なら 1"],
-    ["ふさがれた割合", "O ＝ (1/J) Σ_{j=1}^{J} b_{j}", "14 / 72 ＝ 0.194"],
-    ["予測（モデル F を学習）", "Ŷ ＝ F( h_{1}, …, h_{J}, O, 点の高さ, 面の向き )", "F の種類は来週決める"],
+    ["遮蔽高度角", "h_{j} ＝ max_{i} arctan( (A_{i} − z) / d_{ij} )", "max_{i}：有る建物 i の中で一番高く見える角度を選ぶ（重なっても1回）", "例：正面 arctan(15/25) ＝ 31°"],
+    ["ふさがれているか", "b_{j} ＝ 1（マスの高度 ＜ h_{j}）／ 0（それ以外）", "そのマスが建物より低い方向なら「ふさがれている」", "例：正面の高度0〜15°のマスは 1"],
+    ["ふさがれた割合", "O ＝ (1/J) Σ_{j=1}^{J} b_{j}", "Σ_{j=1}^{J}：J 個のマスの b を全部足す＝ふさがれたマスの数", "例：14 / 72 ＝ 0.194"],
+    ["予測", "Ŷ_{f,k} ＝ F( h_{1}, …, h_{J}, O, z, 面の向き )", "F：SEBEの結果から学習して作る関数（機械学習モデル）", "例：F の種類は来週決める"],
   ];
   eqs.forEach((e, i) => {
-    const y = 3.5 + i * 0.83;
-    T(s, e[0], { x: 0.65, y, w: 5.9, h: 0.22, fontSize: 9.5, bold: true, color: C.teal });
-    T(s, M(e[1]), { x: 0.65, y: y + 0.23, w: 5.9, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
-    T(s, M("例：" + e[2]), { x: 0.65, y: y + 0.52, w: 5.9, h: 0.24, fontSize: 9, bold: true, color: C.dorange });
+    const y = 3.48 + i * 0.85;
+    T(s, e[0], { x: 0.65, y: y + 0.02, w: 1.25, h: 0.3, fontSize: 9.5, bold: true, color: C.teal });
+    T(s, M(e[1]), { x: 1.9, y, w: 4.7, h: 0.3, fontSize: 11, bold: true, color: C.navy });
+    T(s, M(e[2]), { x: 1.9, y: y + 0.3, w: 4.7, h: 0.24, fontSize: 9, color: C.text });
+    T(s, M(e[3]), { x: 1.9, y: y + 0.54, w: 4.7, h: 0.24, fontSize: 9, bold: true, color: C.dorange });
   });
   table(s, [
     ["", "補間＋足し算（来週）", "空の遮られ方（代案）"],
     ["入力データ", "配置の変数", "同じ（内部で②の数値に変換）"],
-    ["学習データ", "1棟だけの65配置", "同じSEBE結果を使える"],
+    ["学習データ", "1棟だけの配置（65 or 37）", "同じSEBE結果を使える"],
     ["テストデータ", "テストA・B", "同じ配置で比べる"],
     ["影の重なり", "足すので二重に数えうる", "max・マス数で1回だけ"],
     ["計算の重さ", "補間だけ（軽い）", "②の計算＋モデル学習"],
@@ -1111,18 +1130,18 @@ function story(s, idx) {
   T(s, "まとめ：今回整理したことと、来週やること", { x: 0.7, y: 0.8, w: 12, h: 0.6, fontSize: 26, bold: true, color: C.white });
   const cols = [
     ["今回整理したこと", C.teal, [
-      "データの役割（学習16・検証8・テスト12・追加5・局所テスト6＝47配置）と、2,500区画→5帯→4配置の重み付き平均の計算",
+      "データの役割（47配置）と、2,500区画→5帯→4隅の重み付き平均（Σ）の計算",
       "最終ツールの変数17個と、有無を0/1の s で表す理由",
-      "4方向で表を全部埋めると約1万配置 → 1棟ずつの結果を足し算で埋める",
-      "足し算の弱点は影の重なり（同じ光を二重に引く）",
+      "4方向を全部計算すると 9⁴＝6,561通り（建物なしも含め1万）→ 各方向を分けて計算し、足し算で推定する",
+      "足し算は影の重なりを含まない → ずれの大きさを確かめる",
     ]],
     ["来週やること", C.orange, [
-      "建物なし1＋各方向16＝65配置（新規49）をSEBEで計算",
+      "1棟だけの配置をSEBEで計算（案A 65配置・新規49／案B 37配置・新規28）",
       "足し算の式で4面×5帯の20個を予測",
       "テストA（1棟）・B（2〜4棟）でSEBEと比べ、棟数ごとの誤差を表にする",
-      "誤差が棟数とともに増えるか＝重なりの影響を数値で示す",
     ]],
     ["まだ決めていないこと", "8FA0BC", [
+      "案Aと案Bのどちらにするか（SEBEの計算時間しだい）",
       "判断の基準（誤差率何%以内なら採用するか）",
       "空の遮られ方の方向の分け方・距離の扱い・モデル",
       "中央の高さ・任意方位への広げ方",
@@ -1139,6 +1158,7 @@ function story(s, idx) {
   T(s, "壁面日射量予測ツールの開発", { x: 0.5, y: 7.13, w: 3.5, h: 0.28, fontSize: 9, color: "8FA0BC" });
   const nEnd = next();
   T(s, `${nEnd} / ${TOTAL}`, { x: 11.33, y: 7.1, w: 1.5, h: 0.32, fontSize: 11, bold: true, color: C.white, align: "right" });
-  s.addNotes("まとめです。データの役割と計算、最終ツールの変数とsの理由、4方向で全部計算すると約1万配置になるので足し算で埋めること、その弱点が影の重なりであることを整理しました。来週はSEBEで65配置を計算し、棟数ごとの誤差を数値で示して、足し算を続けるか代案へ進むかを判断します。");
+  s.addNotes("");
 }
+
 pres.writeFile({ fileName: "/tmp/w/new.pptx" }).then(() => console.log("written"));
