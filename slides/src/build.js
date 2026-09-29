@@ -799,60 +799,101 @@ function story(s, idx) {
 }
 
 // =====================================================================
-// P7-2: 線形補間で4方向ツールを作る場合の計算イメージ
+// P7-2: 線形補間で4方向ツールを作る場合の計算イメージ（図で段階的に）
 // =====================================================================
 {
-  const s = std(next(), 7, "線形補間で4方向ツールを作る場合：入力から出力までの計算の流れ");
+  const s = std(next(), 7, "線形補間の考え方は同じ：変数が増えると「使う点」が2倍ずつ増える");
   story(s, 1);
-  // 左：入力の表
-  R(s, 0.5, 1.7, 5.3, 3.2, C.panel, { round: true, rr: 0.06 });
-  T(s, "入力は12項目（連続8＋有無4）", { x: 0.65, y: 1.76, w: 5.0, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
-  table(s, [
-    ["方向", "有無 s", "高さ A", "隙間 D"],
-    ["北", "s_{N}", "A_{N}", "D_{N}"],
-    ["東", "s_{E}", "A_{E}", "D_{E}"],
-    ["南", "s_{S}", "A_{S}", "D_{S}"],
-    ["西", "s_{W}", "A_{W}", "D_{W}"],
-  ], { x: 0.65, y: 2.1, w: 5.0, colW: [0.9, 1.3, 1.4, 1.4], rowH: 0.32, fs: 10.5, math: true, boldCol0: true });
-  T(s, [
-    { text: "有無 s（0/1）", options: { bold: true, color: C.dorange } },
-    { text: "：補間しない。どの表を使うかを決める", options: { breakLine: true } },
-    { text: "高さ A・隙間 D", options: { bold: true, color: C.teal } },
-    { text: "：連続した値なので補間する（4棟なら8変数）", options: { breakLine: true } },
-    { text: "出力：中央建物の 4面 × 5帯 ＝ 20個 の日射量", options: { bold: true, color: C.navy } },
-  ], { x: 0.65, y: 3.8, w: 5.05, h: 1.0, fontSize: 9.5, color: C.text });
-
-  // 右：計算の流れ
-  T(s, "ツールの中で行う計算（4棟すべてある場合）", { x: 6.05, y: 1.72, w: 6.8, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
-  const st = [
-    ["s を見て、使う表を決める", "有無の組み合わせ 2⁴＝16通りごとに、別の計算済みの表がある"],
-    ["各変数の下側 L と上側 U を探す", "例：A＝35m → 25m と 50m の間，D＝15m → 10m と 25m の間"],
-    ["区間の中の位置 t を求める", "t ＝ (x − L) ÷ (U − L)。下側なら0、真ん中なら0.5、上側なら1"],
-    ["周りの頂点 2⁸＝256個の重みを求める", "南1棟は2変数なので 2²＝4隅。4棟は8変数なので256頂点"],
-    ["256個の保存値を重み付き平均する", "保存値は4棟を同時に置いた配置のSEBE結果。20個の出力それぞれで行う"],
+  // 上段：1変数→2変数→3変数→8変数
+  const panels = [
+    { t: "1変数（高さAだけ）", n: "2点", rule: "下側×0.6 ＋ 上側×0.4", sub: "t＝0.4 なら (1−t) と t" },
+    { t: "2変数（南1棟：A・D）", n: "4隅", rule: "隅の重み＝2つの割合の掛け算", sub: "今回のツール（p.22）" },
+    { t: "3変数", n: "8隅", rule: "隅の重み＝3つの割合の掛け算", sub: "立方体の角" },
+    { t: "8変数（4棟：A・D×4）", n: "2⁸＝256点", rule: "点の重み＝8つの割合の掛け算", sub: "2×2×…×2（8回）：図に描けない" },
   ];
-  st.forEach((t, i) => {
-    const y = 2.08 + i * 0.57;
-    R(s, 6.05, y, 6.8, 0.5, i % 2 ? C.white : C.panel, { round: true, rr: 0.05, line: "E1E5EA" });
-    circleNum(s, 6.13, y + 0.1, i + 1, C.teal, 0.3, 11);
-    T(s, t[0], { x: 6.5, y: y + 0.02, w: 6.3, h: 0.24, fontSize: 10.5, bold: true, color: C.navy });
-    T(s, t[1], { x: 6.5, y: y + 0.25, w: 6.3, h: 0.24, fontSize: 9, color: C.text });
+  panels.forEach((p, i) => {
+    const x = 0.5 + i * 3.1, w = 2.95, y = 1.68;
+    R(s, x, y, w, 2.72, i === 3 ? C.peach : C.panel, { round: true, rr: 0.06 });
+    T(s, p.t, { x: x + 0.1, y: y + 0.05, w: w - 0.2, h: 0.28, fontSize: 10.5, bold: true, color: C.navy, align: "center" });
+    T(s, p.n, { x: x + 0.1, y: y + 1.62, w: w - 0.2, h: 0.36, fontSize: 16, bold: true, color: i === 3 ? C.red : C.dorange, align: "center" });
+    T(s, p.rule, { x: x + 0.1, y: y + 1.98, w: w - 0.2, h: 0.26, fontSize: 9.5, bold: true, color: C.navy, align: "center" });
+    T(s, p.sub, { x: x + 0.1, y: y + 2.24, w: w - 0.2, h: 0.24, fontSize: 9, color: C.muted, align: "center" });
+    if (i < 3) T(s, "×2", { x: x + w - 0.05, y: y + 0.85, w: 0.25, h: 0.3, fontSize: 10, bold: true, color: C.orange, align: "center", margin: 0 });
+  });
+  // 1変数：線分
+  {
+    const x0 = 0.95, x1 = 3.0, y = 2.65;
+    line(s, x0, y, x1, y, { color: C.faint, width: 2 });
+    dot(s, x0, y, 0.2, C.navy, "RECTANGLE"); dot(s, x1, y, 0.2, C.navy, "RECTANGLE");
+    const xs = x0 + 0.4 * (x1 - x0);
+    dot(s, xs, y, 0.24, C.red, "STAR_5_POINT");
+    T(s, "下側 L", { x: x0 - 0.4, y: y + 0.14, w: 0.8, h: 0.22, fontSize: 8.5, color: C.muted, align: "center" });
+    T(s, "上側 U", { x: x1 - 0.4, y: y + 0.14, w: 0.8, h: 0.22, fontSize: 8.5, color: C.muted, align: "center" });
+    T(s, "0.6", { x: x0 - 0.3, y: y - 0.42, w: 0.6, h: 0.24, fontSize: 11, bold: true, color: C.dorange, align: "center" });
+    T(s, "0.4", { x: x1 - 0.3, y: y - 0.42, w: 0.6, h: 0.24, fontSize: 11, bold: true, color: C.dorange, align: "center" });
+    T(s, "入力（t＝0.4）", { x: xs - 0.6, y: y + 0.14, w: 1.2, h: 0.22, fontSize: 8.5, bold: true, color: C.red, align: "center" });
+    T(s, "近い方を多く使う", { x: 0.6, y: 3.0, w: 2.75, h: 0.22, fontSize: 8.5, color: C.muted, align: "center" });
+  }
+  // 2変数：正方形
+  {
+    const cx = 5.07, cy = 2.62, a = 0.9;
+    R(s, cx - a / 2, cy - a / 2, a, a, C.white, { line: C.faint, lw: 1 });
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(q => dot(s, cx + q[0] * a / 2, cy + q[1] * a / 2, 0.18, C.orange, "RECTANGLE"));
+    dot(s, cx - 0.12, cy + 0.12, 0.22, C.red, "STAR_5_POINT");
+    T(s, "A", { x: cx - a / 2 - 0.35, y: cy - 0.12, w: 0.25, h: 0.24, fontSize: 9, color: C.muted });
+    T(s, "D →", { x: cx - 0.25, y: cy - a / 2 - 0.27, w: 0.5, h: 0.22, fontSize: 9, color: C.muted, align: "center" });
+  }
+  // 3変数：立方体
+  {
+    const ox = 7.8, oy = 3.15, a = 0.8, dx = 0.35, dy = 0.3;
+    const P = (i, j, k) => [ox + i * a + k * dx, oy - j * a - k * dy];
+    [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1], [1, 0, 0, 1, 1, 0], [1, 0, 0, 1, 0, 1], [0, 1, 0, 1, 1, 0], [0, 1, 0, 0, 1, 1], [0, 0, 1, 1, 0, 1], [0, 0, 1, 0, 1, 1], [1, 1, 0, 1, 1, 1], [1, 0, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1]].forEach(e => { const p = P(e[0], e[1], e[2]), q = P(e[3], e[4], e[5]); line(s, p[0], p[1], q[0], q[1], { color: C.faint, width: 1 }); });
+    for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) for (let k = 0; k < 2; k++) { const p = P(i, j, k); dot(s, p[0], p[1], 0.16, C.orange, "RECTANGLE"); }
+    const st = P(0.45, 0.4, 0.5); dot(s, st[0], st[1], 0.22, C.red, "STAR_5_POINT");
+  }
+  // 8変数：256マス
+  {
+    const gx = 10.55, gy = 2.05, cs = 0.075;
+    for (let r = 0; r < 16; r++) for (let c = 0; c < 16; c++) R(s, gx + c * cs, gy + r * cs, cs - 0.012, cs - 0.012, (r + c) % 5 === 0 ? "EEA870" : "F2BE92");
+  }
+
+  // 下左：ツールの中の手順
+  R(s, 0.5, 4.55, 6.2, 2.35, C.white, { round: true, rr: 0.06, line: "DCE1E7" });
+  T(s, "ツールの中の計算（4棟すべてある場合）", { x: 0.65, y: 4.6, w: 5.9, h: 0.28, fontSize: 11, bold: true, color: C.navy });
+  const steps = [
+    ["入力12項目（各方向の 有無 s・高さ A・隙間 D）を受け取る", ""],
+    ["s を見て、有無の組み合わせ（16通り）に合う表を選ぶ", "s は補間しない"],
+    ["各変数の位置 t ＝ (x − L) ÷ (U − L) を求める", "例：A＝35m → 0.4"],
+    ["256点それぞれの重み（8つの割合の掛け算）を出す", ""],
+    ["重み × 保存値 を256個足す → 4面×5帯の20個それぞれで", ""],
+  ];
+  steps.forEach((t, i) => {
+    const y = 4.93 + i * 0.38;
+    circleNum(s, 0.65, y + 0.03, i + 1, C.teal, 0.28, 10);
+    T(s, t[0], { x: 1.02, y, w: 4.45, h: 0.34, fontSize: 9.5, bold: true, color: C.navy, valign: "middle" });
+    if (t[1]) T(s, t[1], { x: 5.4, y, w: 1.25, h: 0.34, fontSize: 8.5, color: C.muted, valign: "middle" });
   });
 
-  // 下：式
-  R(s, 0.5, 5.05, 7.3, 1.85, C.navy, { round: true, rr: 0.06 });
-  T(s, "④⑤を式で書くと（ある面・ある帯の1つの出力）", { x: 0.7, y: 5.1, w: 7, h: 0.28, fontSize: 10.5, bold: true, color: C.orange });
-  T(s, M("ŷ ＝ Σ_{b∈｛0,1｝⁸} [ Π_{i=1}^{8} q_{i}(b_{i}) ] × y_{b}"), { x: 0.7, y: 5.42, w: 7, h: 0.5, fontSize: 16, bold: true, color: C.white, align: "center", valign: "middle" });
-  T(s, M("q_{i}(0) ＝ 1 − t_{i}（下側を使う割合），q_{i}(1) ＝ t_{i}（上側を使う割合）"), { x: 0.7, y: 5.95, w: 7, h: 0.3, fontSize: 10.5, bold: true, color: C.white, align: "center" });
-  T(s, "言葉で：各変数の位置から重みを計算し、周囲の256配置の日射量を重み付き平均する", { x: 0.7, y: 6.3, w: 7, h: 0.5, fontSize: 9.5, color: "CADCFC", align: "center" });
-  table(s, [
-    ["記号", "意味"],
-    ["Σ", "256通りの頂点の結果をすべて足す"],
-    ["Π", "8変数それぞれの割合を掛け合わせる"],
-    ["b_{i}＝0 / 1", "変数 i の下側 / 上側の値を使う"],
-    ["y_{b}", "その頂点の配置で保存したSEBE日射量"],
-    ["南1棟では", "8→2 にすると p.22 の4隅の式と同じ"],
-  ], { x: 8.0, y: 5.05, w: 4.85, colW: [1.35, 3.5], rowH: 0.3, fs: 9.5, math: true, boldCol0: true, align: ["center", "left"] });
+  // 下右：式を色分け
+  R(s, 6.9, 4.55, 5.95, 2.35, C.navy, { round: true, rr: 0.06 });
+  T(s, "④⑤を式で書くと（色ごとに意味がある）", { x: 7.05, y: 4.6, w: 5.7, h: 0.28, fontSize: 10.5, bold: true, color: C.orange });
+  T(s, [
+    ...M("ŷ ＝ ", { color: C.white }),
+    ...M("Σ_{b∈｛0,1｝⁸}", { color: "F2A65A" }),
+    ...M(" [ Π_{i=1}^{8} q_{i}(b_{i}) ] ", { color: "7FD1C7" }),
+    ...M("× y_{b}", { color: "F2D16B" }),
+  ], { x: 7.05, y: 4.92, w: 5.7, h: 0.5, fontSize: 16, bold: true, align: "center", valign: "middle" });
+  const chips = [
+    ["F2A65A", "Σ", "256点を全部足す"],
+    ["7FD1C7", "Π q", "その点の重み＝8つの割合の掛け算（q は 1−t か t）"],
+    ["F2D16B", "y", "その点の配置で保存したSEBE日射量"],
+  ];
+  chips.forEach((c, i) => {
+    const y = 5.5 + i * 0.37;
+    R(s, 7.05, y, 0.62, 0.3, c[0], { round: true, rr: 0.05 });
+    T(s, c[1], { x: 7.05, y, w: 0.62, h: 0.3, fontSize: 10, bold: true, color: C.navy, align: "center", valign: "middle", margin: 0 });
+    T(s, c[2], { x: 7.75, y, w: 5.0, h: 0.3, fontSize: 9.5, color: C.white, valign: "middle" });
+  });
   s.addNotes("");
 }
 
