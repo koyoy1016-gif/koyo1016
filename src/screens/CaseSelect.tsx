@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { GameMode, ProgressV1 } from '../types';
 import { GAME_CASES } from '../data/cases';
 import { characterById } from '../data/characters';
+import { FaceThumb } from '../components/FaceThumb';
 
 type Props = {
   initialMode: GameMode | 'all';
@@ -44,19 +45,22 @@ export function CaseSelect({ initialMode, progress, onPlay, onBack }: Props) {
           return (
             <li key={c.id}>
               <button type="button" className="case-card" onClick={() => onPlay(c.id)}>
-                <span className="case-card__top">
-                  <span className="badge badge--lv">Lv.{c.level}</span>
-                  <span className="badge">{MODE_LABEL[c.mode]}</span>
-                  {cleared && <span className="badge badge--result-good">✔ クリア済み（{progress.bestScoreByCaseId[c.id]}点）</span>}
-                  {progress.soloClearedByCaseId[c.id] && <span className="badge badge--solo">★ 独力クリア</span>}
+                {ch && c.initialStateId && <FaceThumb stateId={c.initialStateId} />}
+                <span className="case-card__body">
+                  <span className="case-card__top">
+                    <span className="badge badge--lv">Lv.{c.level}</span>
+                    <span className="badge">{MODE_LABEL[c.mode]}</span>
+                    {cleared && <span className="badge badge--result-good">✔ クリア済み（{progress.bestScoreByCaseId[c.id]}点）</span>}
+                    {progress.soloClearedByCaseId[c.id] && <span className="badge badge--solo">★ 独力クリア</span>}
+                  </span>
+                  <strong>
+                    {c.id}　{c.titleJa}
+                  </strong>
+                  <span>
+                    {ch ? `${ch.nameJa}（${ch.gender === 'male' ? '男性' : '女性'}${ch.age}歳・架空）` : '資料読解（顔画像なし）'}
+                  </span>
+                  <span className="muted">{ch ? `学ぶテーマ：${ch.themeJa}` : '学ぶテーマ：添付文書・試験資料の読み取り'}</span>
                 </span>
-                <strong>
-                  {c.id}　{c.titleJa}
-                </strong>
-                <span>
-                  {ch ? `${ch.nameJa}（${ch.gender === 'male' ? '男性' : '女性'}${ch.age}歳・架空）` : '資料読解（顔画像なし）'}
-                </span>
-                <span className="muted">{ch ? `学ぶテーマ：${ch.themeJa}` : '学ぶテーマ：添付文書・試験資料の読み取り'}</span>
               </button>
             </li>
           );

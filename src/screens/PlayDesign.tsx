@@ -6,6 +6,7 @@ import { FaceImage } from '../components/FaceImage';
 import { ClassificationBadge, SourceChips } from '../components/Badges';
 import { DoseCard, ProcedureDetail } from '../components/ProcedureDetail';
 import { doseReferenceById } from '../data/doseReferences';
+import { allReal } from '../data/imageAssets';
 import { ScorePanel } from '../components/ScorePanel';
 import { totalScore } from '../lib/scoring';
 
@@ -31,11 +32,14 @@ export function PlayDesign({ gameCase: c, nextCaseId, onCleared, onExit, onNext 
   const [magnitude, setMagnitude] = useState<'small' | 'medium' | 'large' | null>(null);
   const [result, setResult] = useState<ChoiceOutcome | null>(null);
   const [hintCount, setHintCount] = useState(0);
+  const [showBefore, setShowBefore] = useState(false);
   const clearedRef = useRef(false); // 二重クリック・再表示による二重計上を防ぐ
 
   const outcomes = infoAdded && c.outcomesAfterInfo ? c.outcomesAfterInfo : c.outcomes;
   const alwaysHints = c.level === 1;
   const knowledgeOnly = c.characterId === null;
+  const stateIds = [c.initialStateId, ...[...c.outcomes, ...(c.outcomesAfterInfo ?? [])].map((o) => o.targetStateId)].filter(Boolean);
+  const illustrationOnly = !allReal(stateIds);
   const doseCards = (c.doseReferenceIds ?? []).map((id) => doseReferenceById.get(id)).filter((d) => !!d);
 
   const plans = useMemo(() => {
@@ -70,12 +74,13 @@ export function PlayDesign({ gameCase: c, nextCaseId, onCleared, onExit, onNext 
   };
 
   const retry = () => {
+    setShowBefore(false);
     setResult(null);
     setPlanKey(null);
     setMagnitude(null);
   };
 
-  const shownState = result ? result.targetStateId : c.initialStateId;
+  const shownState = result && !showBefore ? result.targetStateId : c.initialStateId;
   const isCleared = !!result && result.isRecommended && result.classification !== 'needs_information';
   const wentForInfo = !!result && result.classification === 'needs_information';
   const step = result ? 4 : selectedPlan?.needsMagnitude ? (magnitude ? 3 : 2) : selectedPlan ? 3 : 1;
@@ -92,14 +97,26 @@ export function PlayDesign({ gameCase: c, nextCaseId, onCleared, onExit, onNext 
             ))}
           </section>
         ) : (
-          <FaceImage stateId={shownState} />
+          <>
+            <FaceImage stateId={shownState} illustrationOnly={illustrationOnly} />
+            {result && (
+              <div className="segmented" role="group" aria-label="前後の切り替え表示">
+                <button type="button" className={`segmented__item ${!showBefore ? 'is-selected' : ''}`} aria-pressed={!showBefore} onClick={() => setShowBefore(false)}>
+                  変化後
+                </button>
+                <button type="button" className={`segmented__item ${showBefore ? 'is-selected' : ''}`} aria-pressed={showBefore} onClick={() => setShowBefore(true)}>
+                  はじめの顔
+                </button>
+              </div>
+            )}
+          </>
         )}
         {result && !knowledgeOnly && (
           <details className="compare">
             <summary>はじめの顔と並べて比べる</summary>
             <div className="compare__row">
-              <FaceImage stateId={c.initialStateId} compact />
-              <FaceImage stateId={result.targetStateId} compact />
+              <FaceImage stateId={c.initialStateId} compact illustrationOnly={illustrationOnly} />
+              <FaceImage stateId={result.targetStateId} compact illustrationOnly={illustrationOnly} />
             </div>
             <p className="muted">同じ人物・同じ画角の架空画像を並べています。変化は教育用の架空の表現で、実際の施術結果ではありません。</p>
           </details>

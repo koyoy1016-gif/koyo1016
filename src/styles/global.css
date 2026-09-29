@@ -486,8 +486,9 @@ code {
 }
 .case-card {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
   width: 100%;
   text-align: left;
   min-height: var(--tap);
@@ -929,4 +930,28 @@ p.chips {
   .chip--btn {
     min-height: 44px;
   }
+}
+
+.case-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.thumb {
+  flex: none;
+  width: 64px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--placeholder-bg);
+}
+.thumb img,
+.thumb svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }

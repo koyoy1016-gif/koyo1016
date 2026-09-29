@@ -6,6 +6,7 @@ import { GAME_CASES } from '../data/cases';
 import { CHARACTERS } from '../data/characters';
 import { PROCEDURES } from '../data/procedures';
 import { SOURCES } from '../data/sources';
+import { allReal, hasRealImage } from '../data/imageAssets';
 
 describe('content validation (spec 13.3)', () => {
   it('has no integrity issues', () => {
@@ -88,6 +89,32 @@ describe('encyclopedia (50 items)', () => {
     for (const p of PROCEDURES) {
       if (p.mechanism.status === 'unverified') expect(p.contentStatus).not.toBe('ready_for_knowledge_quiz');
     }
+  });
+});
+
+describe('real face images (src/assets/faces)', () => {
+  const REAL = [
+    'C01_base', 'C01_success', 'C01_over',
+    'C06_base_frown', 'C06_success_frown', 'C06_over_frown',
+    'C07_base_smile', 'C07_success_smile', 'C07_over_smile',
+  ];
+
+  it('the nine supplied sample images are picked up automatically', () => {
+    for (const id of REAL) expect(hasRealImage(id)).toBe(true);
+  });
+
+  it('cases that use only supplied images render fully with real images', () => {
+    for (const cid of ['B01', 'B20', 'B21', 'B22']) {
+      const c = GAME_CASES.find((x) => x.id === cid)!;
+      const ids = [c.initialStateId, ...c.outcomes.map((o) => o.targetStateId)];
+      expect(allReal(ids)).toBe(true);
+    }
+  });
+
+  it('cases with missing images fall back to illustrations as a whole (never mixed)', () => {
+    const c = GAME_CASES.find((x) => x.id === 'A04')!;
+    const ids = [c.initialStateId, ...(c.reverseHistory ?? []).flatMap((s) => [s.beforeStateId, s.afterStateId])];
+    expect(allReal(ids)).toBe(false);
   });
 });
 

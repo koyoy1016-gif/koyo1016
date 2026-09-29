@@ -72,8 +72,8 @@ export const CHARACTER_LOOKS: Record<string, Look> = {
   C03: { base: { skin: SKIN.olive, hairStyle: 'buzz', shirt: '#3a3f47', age: 35, jawW: 1, jawSquare: 1, lipThick: 0.3, chinProj: 0.6 } },
   C04: { base: { skin: SKIN.dark, hairStyle: 'medium', shirt: '#6b3f52', age: 34, jawW: 0.2, jawSquare: 0.1, cheekHollow: 0.35, lipThick: 0.45 } },
   C05: { base: { skin: SKIN.medium, hairStyle: 'short', shirt: '#2f4b45', age: 31, jawW: 0.55, jawSquare: 0.4, sag: 0.45, chinProj: 0.4 } },
-  C06: { base: { skin: SKIN.medium, hair: '#3a2a20', hairStyle: 'medium', shirt: '#7a5a3a', age: 38, jawW: 0.35, glabella: 0.75, lipThick: 0.35 } },
-  C07: { base: { skin: SKIN.dark, hairStyle: 'short', shirt: '#33415c', age: 42, jawW: 0.6, jawSquare: 0.5, crowsFeet: 0.6, lipThick: 0.35 } },
+  C06: { base: { skin: SKIN.light, hair: '#2a2320', hairStyle: 'medium', shirt: '#7a5a3a', age: 38, jawW: 0.35, glabella: 0.75, lipThick: 0.35 } },
+  C07: { base: { skin: SKIN.medium, hair: '#6d6a68', hairStyle: 'short', shirt: '#33415c', age: 42, jawW: 0.6, jawSquare: 0.5, crowsFeet: 0.6, lipThick: 0.35 } },
   C08: { base: { skin: SKIN.light, hairStyle: 'pony', shirt: '#8a6a7a', age: 23, jawW: 0.2, jawSquare: 0.05, lipThick: 0.4, lid: 0 } },
   C09: { base: { skin: SKIN.medium, hair: '#6d6a68', hairStyle: 'short', shirt: '#3b4a5a', age: 46, jawW: 0.6, jawSquare: 0.5, eyeBulge: 0.7, eyeGroove: 0.6, darkCircle: 0.2 } },
   C10: { base: { skin: SKIN.light, hair: '#2a2320', hairStyle: 'long', shirt: '#5a6f7a', age: 40, jawW: 0.3, darkCircle: 0.55, eyeBulge: 0.12 } },
@@ -92,6 +92,9 @@ export const CHARACTER_LOOKS: Record<string, Look> = {
 /** 状態ID（表情サフィックスを除く）ごとの、基準からの差分 */
 export const STATE_DELTAS: Record<string, Partial<FaceParams>> = {
   C01_success: { jawW: 0.6, jawSquare: 0.38 },
+  C01_over: { jawW: 0.5, jawSquare: 0.3, cheekHollow: 0.75 },
+  C06_over: { glabella: 0.02 },
+  C07_over: { crowsFeet: 0.02 },
   C01_a04_lipmass: { jawW: 0.6, jawSquare: 0.38, lipThick: 0.62 },
   C02_success: { lipThick: 0.4 },
   C02_medium: { lipThick: 0.62, lipProtrude: 0.15 },

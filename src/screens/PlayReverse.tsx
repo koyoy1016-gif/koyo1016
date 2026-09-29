@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { GameCase, ReverseHistoryStep } from '../types';
 import { REGIONS, regionById } from '../data/regions';
 import { procedureById } from '../data/procedures';
-import { imageAssetByStateId } from '../data/imageAssets';
+import { allReal, imageAssetByStateId } from '../data/imageAssets';
 import { CaseInfo } from '../components/CaseInfo';
 import { FaceImage } from '../components/FaceImage';
 import { SourceChips } from '../components/Badges';
@@ -35,7 +35,16 @@ export function PlayReverse({ gameCase: c, nextCaseId, onCleared, onExit, onNext
   const [wrong, setWrong] = useState(0);
   const [msg, setMsg] = useState<Msg>(null);
   const [hintOpen, setHintOpen] = useState(false);
-  const [expr, setExpr] = useState<'neutral' | 'variant'>('neutral');
+  // 実画像と仮イラストが混ざらないよう、表示の種類はケース単位（と表情）で統一する
+  const baseStateIds = useMemo(() => [c.initialStateId, ...(c.reverseHistory ?? []).flatMap((s2) => [s2.beforeStateId, s2.afterStateId])], [c]);
+  const variantStateIds = useMemo(
+    () => (c.expressionVariant ? baseStateIds.map((id) => `${id}_${c.expressionVariant}`) : []),
+    [c, baseStateIds],
+  );
+  const neutralReal = allReal(baseStateIds);
+  const variantReal = variantStateIds.length > 0 && allReal(variantStateIds);
+  const showExprToggle = !!c.expressionVariant && neutralReal === variantReal;
+  const [expr, setExpr] = useState<'neutral' | 'variant'>(!neutralReal && variantReal ? 'variant' : 'neutral');
   const clearedRef = useRef(false);
 
   const top = remaining[0];
@@ -44,6 +53,7 @@ export function PlayReverse({ gameCase: c, nextCaseId, onCleared, onExit, onNext
   const alwaysHints = c.level === 1;
   const showNarrowing = !!top && (hintOpen || attemptsLeft === 0);
 
+  const illustrationOnly = !(expr === 'variant' ? variantReal : neutralReal);
   const displayStateId = (() => {
     if (expr === 'variant' && c.expressionVariant) {
       const v = `${currentStateId}_${c.expressionVariant}`;
@@ -123,6 +133,7 @@ export function PlayReverse({ gameCase: c, nextCaseId, onCleared, onExit, onNext
       <div className="play__face">
         <FaceImage
           stateId={displayStateId}
+          illustrationOnly={illustrationOnly}
           selectableRegions={!done}
           selectedRegionId={region}
           onSelectRegion={(id) => {
@@ -130,7 +141,7 @@ export function PlayReverse({ gameCase: c, nextCaseId, onCleared, onExit, onNext
             setMsg(null);
           }}
         />
-        {c.expressionVariant && (
+        {showExprToggle && (
           <div className="segmented" role="group" aria-label="表情の比較">
             <button type="button" className={`segmented__item ${expr === 'neutral' ? 'is-selected' : ''}`} onClick={() => setExpr('neutral')}>
               無表情

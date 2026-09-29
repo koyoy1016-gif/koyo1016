@@ -56,6 +56,12 @@ export const STATE_DEFS: StateDef[] = [
     allowedRegion: '下顔面の左右の軟部', visualDelta: '左右下顔面の張りを控えめに減らす', lockedRegions: `骨の輪郭、頬の健康的な量、鼻、口、目、${LOCK_COMMON}`, timeState: '処置後、落ち着いた後の想定' },
   { stateId: 'C01_a04_lipmass', characterId: 'C01', expression: 'neutral', kind: 'edit', altJa: '悠斗：下顔面の張りが控えめで、唇にも控えめなボリュームがある。', timeLabelJa: '2段階の変更後（架空）',
     allowedRegion: '下顔面の軟部と唇', visualDelta: 'C01_successの状態に、さらに唇へ控えめな厚みを加える', lockedRegions: `骨の輪郭、頬の量、鼻、目、${LOCK_COMMON}`, timeState: '2段階の変更後、落ち着いた後の想定' },
+  { stateId: 'C01_over', characterId: 'C01', expression: 'neutral', kind: 'edit', altJa: '悠斗：下顔面が細くなり、頬骨下のくぼみと影が目立つ架空の分岐。', timeLabelJa: TL.over,
+    allowedRegion: '下顔面の左右と頬骨下', visualDelta: '下顔面が細くなり、頬骨下のくぼみと影が目立つ架空の形。やせた全身・病気・老化は加えない。血や傷は描かない', lockedRegions: `鼻、口、目、髪、${LOCK_COMMON}`, timeState: '希望を超える設定の架空の分岐' },
+  { stateId: 'C06_over_frown', characterId: 'C06', expression: 'frown', kind: 'edit', altJa: '遥：表情筋の働きを弱め過ぎ、眉間を寄せようとしても表情が動きにくい架空の分岐。', timeLabelJa: '働きを弱め過ぎた例（架空の分岐）',
+    allowedRegion: '眉間〜眉・上まぶたの表情', visualDelta: '眉間を寄せようとしても動きが乏しく、眉・目元の表情が平板になる。皮膚の色・骨格・年齢は変えない', lockedRegions: LOCK_COMMON.replace('表情・', ''), timeState: '希望を超える設定の架空の分岐' },
+  { stateId: 'C07_over_smile', characterId: 'C07', expression: 'smile', kind: 'edit', altJa: '翔：表情筋の働きを弱め過ぎ、笑顔が動きにくくなる架空の分岐。', timeLabelJa: '表情が動きにくい例（架空の分岐）',
+    allowedRegion: '目尻〜目元の表情', visualDelta: '笑っても目元の動きが乏しく、笑顔が硬く見える。皮膚の色・骨格・年齢は変えない', lockedRegions: LOCK_COMMON.replace('表情・', ''), timeState: '希望を超える設定の架空の分岐' },
   // C02
   { stateId: 'C02_base', characterId: 'C02', expression: 'neutral', kind: 'base', altJa: '美緒（架空・26歳女性）のはじめの顔。唇は薄め。', timeLabelJa: TL.base,
     baselineFeature: '薄めの上下唇、小さな自然な左右差。輪郭・鼻・目は本人が気に入っている' },
@@ -199,6 +205,12 @@ export const IMAGE_ASSETS: ImageAsset[] = STATE_DEFS.map((d) => {
 });
 
 export const imageAssetByStateId = new Map(IMAGE_ASSETS.map((a) => [a.stateId, a]));
+
+/** 生成画像（src/assets/faces）が置かれているか */
+export const hasRealImage = (stateId: string): boolean => !!imageAssetByStateId.get(stateId)?.src;
+
+/** 全ての状態が実画像なら true。一部でも欠けるケースは、仮イラストで統一して表示する */
+export const allReal = (stateIds: string[]): boolean => stateIds.length > 0 && stateIds.every(hasRealImage);
 
 export const stateDefByStateId = new Map(STATE_DEFS.map((d) => [d.stateId, d]));
 
