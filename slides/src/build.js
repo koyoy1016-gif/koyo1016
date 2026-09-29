@@ -306,12 +306,12 @@ function story(s, idx) {
   R(s, 0.65, 4.72, 5.9, 2.1, C.navy, { round: true, rr: 0.06 });
   T(s, ML([
     ["帯の平均：y_{k} ＝ (1/500) Σ_{(p,q)∈帯k} G_{p,q}", { color: C.white }],
-    ["Σ_{(p,q)∈帯k}：帯kに入る500区画の G を全部足す", { color: "CADCFC", fontSize: 9.5, bold: false }],
+    ["G_{p,q}：区画(p,q)の年間日射量（SEBE）　p：横の番号　q：縦の番号　k：帯の番号（1〜5）　Σ_{(p,q)∈帯k}：帯kの500区画を全部足す", { color: "CADCFC", fontSize: 8.5, bold: false }],
     ["帯1に代入：y_{1} ＝ 168,670.31 ÷ 500 ＝ 337.34 kWh/m²", { color: C.orange }],
     ["全体平均：ȳ ＝ (1/5) Σ_{k=1}^{5} y_{k}（帯1〜5を足して5で割る）", { color: C.white }],
     ["＝ (337.34＋351.22＋382.57＋485.55＋867.14) / 5 ＝ 484.76", { color: C.orange }],
-  ]), { x: 0.8, y: 4.78, w: 5.65, h: 1.72, fontSize: 10.5, bold: true, lineSpacingMultiple: 1.15 });
-  T(s, "※ 500区画の合計（168,670.31）は、保存した帯平均×500 で逆算した値", { x: 0.8, y: 6.52, w: 5.65, h: 0.26, fontSize: 8.5, color: "CADCFC" });
+    ["y_{k}：帯kの平均日射量　ȳ：南面全体の平均　（合計168,670.31は保存値×500で逆算）", { color: "CADCFC", fontSize: 8.5, bold: false }],
+  ]), { x: 0.8, y: 4.76, w: 5.65, h: 2.02, fontSize: 10, bold: true, lineSpacingMultiple: 1.1 });
 
   T(s, "16配置ぶんでは、何を何個数えているか", { x: 6.95, y: 1.62, w: 5.9, h: 0.3, fontSize: 12, bold: true, color: C.navy });
   table(s, [
@@ -362,7 +362,7 @@ function story(s, idx) {
     ["w_{4}：(75, 25)", "u ＝ 0.236", "v ＝ 0.267", { t: "0.063", o: { bold: true } }],
     [{ t: "合計", o: { bold: true } }, "", "", { t: "1", o: { bold: true } }],
   ], { x: 1.05, y: 4.22, w: 5.3, colW: [1.5, 1.3, 1.3, 1.2], rowH: 0.3, fs: 9.5, math: true, boldCol0: true });
-  T(s, "入力に一番近い (50,10) の重みが最大。入力が隅にぴったり重なると、その隅の重みが1になり、保存値そのものになる。", { x: 0.65, y: 6.1, w: 5.75, h: 0.72, fontSize: 9.5, color: C.text });
+  T(s, [{ text: "記号　", options: { bold: true, color: C.teal } }, ...M("A・D：入力の高さ・隙間　A_{0}・A_{1}（D_{0}・D_{1}）：入力を挟む計算済みの下側・上側　u・v：位置の割合　c：隅の番号（1〜4）　w_{c}：隅cの重み　y_{k}(A_{c},D_{c})：隅cに保存した帯kの値　ŷ_{k}：帯kの予測値（^は予測）", { color: C.text })], { x: 0.65, y: 6.05, w: 5.75, h: 0.8, fontSize: 8.5 });
 
   // 右：重みで混ぜる
   R(s, 6.75, 1.62, 6.1, 5.28, C.white, { round: true, rr: 0.06, line: "DCE1E7" });
@@ -417,8 +417,7 @@ function story(s, idx) {
     T(s, M(f[1]), { x: 2.55, y: y + 0.04, w: 4.9, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
     T(s, M(f[2]), { x: 2.55, y: y + 0.37, w: 4.9, h: 0.3, fontSize: 10, bold: true, color: C.dorange });
   });
-  T(s, M("Σ_{j=1}^{N}：1件目から N 件目までを順に足す記号（N＝比べた値の数）"), { x: 0.5, y: 6.47, w: 7, h: 0.26, fontSize: 9.5, bold: true, color: C.teal });
-  T(s, "※ 8件の絶対誤差の合計 159.92 は MAE 19.99 × 8 で逆算した値", { x: 0.5, y: 6.73, w: 7, h: 0.2, fontSize: 8, color: C.muted });
+  T(s, [{ text: "記号　", options: { bold: true, color: C.teal } }, ...M("y：正解値（SEBE）　ŷ：予測値　e：誤差　j：比べる値の番号　N：比べた値の数　Σ_{j=1}^{N}：1〜N件目を順に足す　max_{j}：一番大きいもの", { color: C.text })], { x: 0.5, y: 6.44, w: 7, h: 0.46, fontSize: 8.5 });
   table(s, [
     ["評価の目的", "使ったデータ", "N", "結果"],
     ["手法の比較（検証）", "検証8配置・全体平均", "8", "MAE 19.99・2.67%"],
@@ -431,6 +430,7 @@ function story(s, idx) {
     "テストデータは方法を決めた後にだけ使った（結果を見て方法を変えていない）",
     "「× 5帯」の N は値の数で、配置の数ではない",
     "数値はSEBEとの比較。実測日射量や発電量の精度ではない",
+    "8件の絶対誤差の合計 159.92 は MAE 19.99×8 で逆算した値",
   ], { gap: 3 }), { x: 7.9, y: 5.23, w: 4.85, h: 1.6, fontSize: 9.5 });
   s.addNotes("精度は予測とSEBEの差で評価します。最も外れたA=35m・D=15mの30〜40m帯では、誤差は−152.94、誤差率は15.08%です。MAEはこの絶対誤差をN件分平均したもので、検証8配置では19.99です。上の流れのように、検証で方法を決めてからテストデータを使っています。");
 }
@@ -646,7 +646,7 @@ function story(s, idx) {
     ["1帯の高さ（H_{C}/5）", "5m", "10m", "15m", "20m"],
     ["出力数", "20", "20", "20", "20"],
   ], { x: 7.8, y: 5.3, w: 5.05, colW: [1.85, 0.8, 0.8, 0.8, 0.8], rowH: 0.3, fs: 10, math: true, boldCol0: true });
-  T(s, "南1棟の段階では「南面×5帯＝5個」だった出力が、4面に増える。", { x: 7.8, y: 6.3, w: 5.05, h: 0.5, fontSize: 9.5, color: C.muted });
+  T(s, [{ text: "記号　", options: { bold: true, color: C.teal } }, ...M("Ŷ：予測値（^は予測）　f：面（北・東・南・西）　k：帯の番号（1〜5）　H_{C}：中央建物の高さ　Σ_{k=1}^{5}：帯1〜5を足す", { color: C.text })], { x: 7.8, y: 6.28, w: 5.05, h: 0.6, fontSize: 8.5 });
   s.addNotes("立体で見ると、中央建物の高さH_Cと、周囲建物の高さAの位置が分かります。隙間Dは地面上の壁と壁の距離です。出力は中央建物の北・東・南・西の4面をそれぞれ5帯に分けた20個です。中央の高さを変えた場合は、10m刻みではなく高さを5等分します。");
 }
 
@@ -809,7 +809,7 @@ function story(s, idx) {
   story(s, 1);
   // 上段：1変数→2変数→3変数→8変数
   const panels = [
-    { t: "1変数（高さAだけ）", n: "2点", rule: "下側×0.6 ＋ 上側×0.4", sub: "t＝0.4 なら (1−t) と t" },
+    { t: "1変数（高さAだけ）", n: "2点", rule: "下側×0.6 ＋ 上側×0.4", sub: "t：入力の位置の割合 → 下側 1−t，上側 t" },
     { t: "2変数（南1棟：A・D）", n: "4隅", rule: "隅の重み＝2つの割合の掛け算", sub: "今回のツール（p.22）" },
     { t: "3変数", n: "8隅", rule: "隅の重み＝3つの割合の掛け算", sub: "立方体の角" },
     { t: "8変数（4棟：A・D×4）", n: "2⁸＝256点", rule: "点の重み＝8つの割合の掛け算", sub: "2×2×…×2（8回）：図に描けない" },
@@ -1127,7 +1127,8 @@ function story(s, idx) {
     T(s, c[1], { x, y: 5.82, w: 0.6, h: 0.3, fontSize: 10, bold: true, color: C.navy, align: "center", valign: "middle", margin: 0 });
     T(s, c[2], { x: x + 0.68, y: 5.82, w: 3.35, h: 0.3, fontSize: 9.5, color: C.white, valign: "middle" });
   });
-  T(s, "重みは20個の出力（4面×5帯）で共通。面・帯が変わると y だけが変わる。4棟あると 4×4×4×4＝256マス → では表には何個必要？（次のページ）", { x: 0.7, y: 6.3, w: 12, h: 0.5, fontSize: 10, color: "CADCFC", valign: "middle" });
+  T(s, [{ text: "記号　", options: { bold: true, color: C.orange } }, ...M("ŷ_{南面,1}：南面・帯1の予測値　b：どのマスか（各変数で下側0・上側1を選んだ組、2⁴＝16通り）　i：変数の番号（A南・D南・A東・D東）　t_{i}：変数iの位置の割合（p.32）　q_{i}(0)＝1−t_{i}：下側の割合　q_{i}(1)＝t_{i}：上側の割合　y_{b}・y_{1}〜y_{16}：そのマスの配置のSEBE保存値", { color: "E1E8F2" })], { x: 0.7, y: 6.15, w: 12, h: 0.42, fontSize: 8.5 });
+  T(s, "重みは20個の出力で共通（面・帯が変わると y だけ変わる）。4棟あると 256マス → 表には何個必要？（次のページ）", { x: 0.7, y: 6.58, w: 12, h: 0.26, fontSize: 9, color: "CADCFC" });
   s.addNotes("");
 }
 
@@ -1367,7 +1368,7 @@ function story(s, idx) {
   T(s, "隙間 25m", { x: X(-25), y: gy + 0.14, w: 25 * k, h: 0.22, fontSize: 8.5, bold: true, color: C.red, align: "center" });
   T(s, [{ text: "━ 空が見える　", options: { color: C.green } }, { text: "━ 建物でふさがれる", options: { color: C.red } }], { x: 0.7, y: 2.0, w: 4, h: 0.24, fontSize: 8.5, bold: true });
   R(s, 0.7, 6.15, 5.7, 0.62, C.white, { round: true, rr: 0.05 });
-  T(s, "遮蔽高度角 h：tan h ＝ (35 − 20) / 25 ＝ 0.6 → h ≒ 31°（これより低い方向はふさがれる）", { x: 0.8, y: 6.15, w: 5.5, h: 0.62, fontSize: 9.5, bold: true, color: C.navy, valign: "middle" });
+  T(s, "遮蔽高度角 h：tan h ＝ (建物の高さ35 − 点Pの高さ20) ÷ 隙間25 ＝ 0.6 → h ≒ 31°（hより低い方向はふさがれる）", { x: 0.8, y: 6.15, w: 5.5, h: 0.62, fontSize: 9.5, bold: true, color: C.navy, valign: "middle" });
 
   R(s, 6.85, 1.62, 6.0, 3.3, C.panel, { round: true, rr: 0.06 });
   T(s, "点Pから見た「空の地図」（12方位 × 6高度 ＝ 72マス）", { x: 7.0, y: 1.68, w: 5.8, h: 0.28, fontSize: 11, bold: true, color: C.navy });
@@ -1415,17 +1416,16 @@ function story(s, idx) {
   R(s, 0.5, 3.1, 6.2, 3.8, C.panel, { round: true, rr: 0.06 });
   T(s, "想定している計算（前ページの点Pの値）", { x: 0.65, y: 3.16, w: 5.9, h: 0.28, fontSize: 11.5, bold: true, color: C.navy });
   const eqs = [
-    ["遮蔽高度角", "h_{j} ＝ max_{i} arctan( (A_{i} − z) / d_{ij} )", "max_{i}：有る建物 i の中で一番高く見える角度を選ぶ（重なっても1回）", "例：正面 arctan(15/25) ＝ 31°"],
-    ["ふさがれているか", "b_{j} ＝ 1（マスの高度 ＜ h_{j}）／ 0（それ以外）", "そのマスが建物より低い方向なら「ふさがれている」", "例：正面の高度0〜15°のマスは 1"],
-    ["ふさがれた割合", "O ＝ (1/J) Σ_{j=1}^{J} b_{j}", "Σ_{j=1}^{J}：J 個のマスの b を全部足す＝ふさがれたマスの数", "例：14 / 72 ＝ 0.194"],
-    ["予測", "Ŷ_{f,k} ＝ F( h_{1}, …, h_{J}, O, z, 面の向き )", "F：SEBEの結果から学習して作る関数（機械学習モデル）", "例：F の種類は来週決める"],
+    ["遮蔽高度角", "h_{j} ＝ max_{i} arctan( (A_{i} − z) / d_{ij} )", "j：空の方向（マス）の番号　A_{i}：建物iの高さ　z：壁の点の高さ　d_{ij}：方向jで建物iまでの水平距離　max_{i}：有る建物の中で一番大きい角度", "例：31°"],
+    ["ふさがれているか", "b_{j} ＝ 1（マスの高度 ＜ h_{j}）／ 0", "b_{j}＝1：マスjが建物より低い方向＝ふさがれている　b_{j}＝0：空が見える", "例：0〜15°は1"],
+    ["ふさがれた割合", "O ＝ (1/J) Σ_{j=1}^{J} b_{j}", "J：マスの数（例：72）　Σ_{j=1}^{J}：J個のマスの b_{j} を全部足す＝ふさがれたマスの数", "例：14/72＝0.194"],
+    ["予測", "Ŷ_{f,k} ＝ F( h_{1}, …, h_{J}, O, z, 面の向き )", "F：SEBEの結果から学習して作る関数（機械学習モデル）　f：面　k：帯の番号　Ŷ：予測値", "Fは来週決める"],
   ];
   eqs.forEach((e, i) => {
     const y = 3.48 + i * 0.85;
     T(s, e[0], { x: 0.65, y: y + 0.02, w: 1.25, h: 0.3, fontSize: 9.5, bold: true, color: C.teal });
-    T(s, M(e[1]), { x: 1.9, y, w: 4.7, h: 0.3, fontSize: 11, bold: true, color: C.navy });
-    T(s, M(e[2]), { x: 1.9, y: y + 0.3, w: 4.7, h: 0.24, fontSize: 9, color: C.text });
-    T(s, M(e[3]), { x: 1.9, y: y + 0.54, w: 4.7, h: 0.24, fontSize: 9, bold: true, color: C.dorange });
+    T(s, [...M(e[1], { color: C.navy }), { text: "　" + e[3], options: { color: C.dorange, fontSize: 9 } }], { x: 1.9, y, w: 4.7, h: 0.3, fontSize: 11, bold: true });
+    T(s, M(e[2]), { x: 1.9, y: y + 0.31, w: 4.7, h: 0.48, fontSize: 8.5, color: C.text });
   });
   table(s, [
     ["", "線形補間（全組み合わせ）", "空の遮られ方（代案）"],
