@@ -46,7 +46,7 @@ children.push(new Paragraph({
 children.push(new Paragraph({
   spacing: { after: 240 },
   border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "D5DAE1", space: 6 } },
-  children: [run("※ 30〜32枚目の 1000・700・900・600・640 と時間帯、34枚目の低い建物の値は説明用の仮の値です。29枚目の「1回10分」も仮の値なので、実際のSEBEの計算時間に置き換えてください。", { color: MUTED, size: 20 })],
+  children: [run("※ 31枚目の保存値600と、34枚目の低い建物の値は説明用の仮の値です。計算時間は、SEBE 1回を30秒〜1分として見積もっています。", { color: MUTED, size: 20 })],
 }));
 
 data.slides.forEach(sl => {
