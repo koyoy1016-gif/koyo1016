@@ -1,4 +1,4 @@
-// 発表原稿（19〜38枚目）の Word ファイルを作る
+// 発表原稿（19〜41枚目）の Word ファイルを作る
 const fs = require("fs");
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle,
@@ -36,17 +36,17 @@ children.push(new Paragraph({
 }));
 children.push(new Paragraph({
   heading: HeadingLevel.TITLE, spacing: { after: 120 },
-  children: [run("発表原稿：補足（19〜38枚目）", { size: 36, bold: true, color: NAVY })],
+  children: [run("発表原稿：補足（19〜41枚目）", { size: 36, bold: true, color: NAVY })],
 }));
 const total = data.slides.reduce((a, s) => a + s.text.length, 0);
 children.push(new Paragraph({
   spacing: { after: 80 },
-  children: [run(`全20枚・読み上げの目安 約${Math.round(total / CPM)}分（1分あたり約${CPM}字で計算）`, { color: MUTED, size: 20 })],
+  children: [run(`全23枚・読み上げの目安 約${Math.round(total / CPM)}分（1分あたり約${CPM}字で計算）`, { color: MUTED, size: 20 })],
 }));
 children.push(new Paragraph({
   spacing: { after: 240 },
   border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "D5DAE1", space: 6 } },
-  children: [run("※ 32・33枚目の保存値600と、36枚目の低い建物の値は説明用の仮の値です。計算時間は、SEBE 1回を30秒〜1分として見積もっています。", { color: MUTED, size: 20 })],
+  children: [run("※ 33枚目の保存値600と、39枚目の低い建物の値は説明用の仮の値です。計算時間は、SEBE 1回を30秒〜1分として見積もっています。", { color: MUTED, size: 20 })],
 }));
 
 data.slides.forEach(sl => {
