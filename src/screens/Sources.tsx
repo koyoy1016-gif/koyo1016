@@ -7,6 +7,7 @@ const KIND_JA = {
   study: '研究',
   hospital_education: '医療機関・学会の患者向け資料',
   clinic_price: '医療機関の価格掲載',
+  press_release: '企業発表',
   reproduced_label: '製品説明の掲載資料',
 } as const;
 

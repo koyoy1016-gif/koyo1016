@@ -58,7 +58,7 @@ export const RECOVERY_CARDS: RecoveryCard[] = [
     visibleSwellingRednessJa: '治癒約3週という説明例',
     settledEvaluationJa: '最終結果はさらに数か月という説明例',
     limitationsJa: '説明例であり、個別確認が必要。',
-    sourceIds: [],
+    sourceIds: ['S10'],
   },
   {
     id: 'D6',

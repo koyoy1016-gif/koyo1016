@@ -7,6 +7,7 @@ import { PROCEDURES, procedureById } from '../data/procedures';
 import { RECOVERY_CARDS } from '../data/recoveryCards';
 import { SOURCES } from '../data/sources';
 import { REGIONS } from '../data/regions';
+import { COMPARISONS, TERM_NOTES } from '../data/comparisons';
 import type { Claim, ChoiceOutcome } from '../types';
 
 /** 仕様13.3のコンテンツ検証。問題があれば日本語メッセージの配列を返す（空なら合格）。 */
@@ -109,6 +110,21 @@ export const validateContent = (): string[] => {
       if (last && last.afterStateId !== c.initialStateId) issues.push(`${c.id}: 初期画像が最後の変更後の状態と一致しない`);
       c.allowedProcedureIds.forEach((pid) => { if (!procedureById.has(pid)) issues.push(`${c.id}: 選択肢の施術 ${pid} が未登録`); });
     }
+  }
+
+  // 図鑑：見分け方カード・用語メモの参照
+  for (const c of COMPARISONS) {
+    for (const id of c.procedureIds) if (!procedureById.has(id)) issues.push(`${c.id}: 施術 ${id} が未登録`);
+    for (const sid of c.sourceIds) if (!sourceIds.has(sid)) issues.push(`${c.id}: 出典 ${sid} が未登録`);
+    const pendingIds = c.procedureIds.filter((id) => procedureById.get(id)?.contentStatus !== 'ready_for_knowledge_quiz');
+    if (pendingIds.length > 0 && !c.pendingNoteJa) issues.push(`${c.id}: 確認待ちの施術（${pendingIds.join(',')}）を含むのに注記がない`);
+  }
+  for (const t of TERM_NOTES) for (const id of t.procedureIds) if (!procedureById.has(id)) issues.push(`${t.id}: 施術 ${id} が未登録`);
+
+  // 図鑑：確認待ち項目を確認済みに見せない
+  for (const p of PROCEDURES) {
+    if (p.contentStatus === 'ready_for_knowledge_quiz' && p.mechanism.status === 'unverified')
+      issues.push(`${p.id}: 作用が未確認なのに知識問題に使用可になっている`);
   }
 
   return issues;

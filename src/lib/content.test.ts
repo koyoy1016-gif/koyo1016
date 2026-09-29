@@ -4,6 +4,8 @@ import { emptyProgress, recordClear } from './progressStore';
 import { reverseScore, totalScore } from './scoring';
 import { GAME_CASES } from '../data/cases';
 import { CHARACTERS } from '../data/characters';
+import { PROCEDURES } from '../data/procedures';
+import { SOURCES } from '../data/sources';
 
 describe('content validation (spec 13.3)', () => {
   it('has no integrity issues', () => {
@@ -54,6 +56,38 @@ describe('content validation (spec 13.3)', () => {
     expect(all.some((o) => o.choiceId === 'b04_fat' && o.classification === 'exceeds_goal')).toBe(true);
     expect(all.some((o) => o.choiceId === 'b02_lip_large' && o.classification === 'exceeds_goal')).toBe(true);
     expect(all.some((o) => o.classification === 'defer' && o.isRecommended)).toBe(true);
+  });
+});
+
+describe('encyclopedia (50 items)', () => {
+  it('contains exactly P01..P50 without duplicates', () => {
+    const ids = PROCEDURES.map((p) => p.id).sort();
+    const expected = Array.from({ length: 50 }, (_, i) => `P${String(i + 1).padStart(2, '0')}`);
+    expect(ids).toEqual(expected);
+  });
+
+  it('every procedure has all required card fields', () => {
+    for (const p of PROCEDURES) {
+      expect(p.mechanism.textJa.length).toBeGreaterThan(0);
+      expect(p.reversibility.textJa.length).toBeGreaterThan(0);
+      expect(p.expectedChanges.length).toBeGreaterThan(0);
+      expect(p.limitations.length).toBeGreaterThan(0);
+      expect(p.importantComplications.length).toBeGreaterThan(0);
+      expect(p.evaluationTimingJa.length).toBeGreaterThan(0);
+      expect(p.durabilityJa.length).toBeGreaterThan(0);
+      expect(p.recoveryCardIds.length).toBeGreaterThan(0);
+      expect(p.independentlyReviewedByClinician).toBe(false);
+    }
+  });
+
+  it('has all 34 sources S01-S34', () => {
+    expect(SOURCES.map((s) => s.id).sort()).toEqual(Array.from({ length: 34 }, (_, i) => `S${String(i + 1).padStart(2, '0')}`));
+  });
+
+  it('unverified-only procedures are never marked ready for quiz', () => {
+    for (const p of PROCEDURES) {
+      if (p.mechanism.status === 'unverified') expect(p.contentStatus).not.toBe('ready_for_knowledge_quiz');
+    }
   });
 });
 

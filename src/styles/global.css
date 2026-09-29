@@ -904,3 +904,29 @@ meter {
     transition: none !important;
   }
 }
+
+.dex-group {
+  margin: 20px 0 6px;
+  font-size: 1.05rem;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.chip--btn {
+  min-height: 32px;
+  padding: 2px 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--select);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+p.chips {
+  margin: 6px 0;
+}
+@media (pointer: coarse) {
+  .chip--btn {
+    min-height: 44px;
+  }
+}

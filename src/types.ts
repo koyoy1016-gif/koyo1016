@@ -26,6 +26,7 @@ export type Source = {
     | 'study'
     | 'hospital_education'
     | 'clinic_price'
+    | 'press_release'
     | 'reproduced_label';
   publishedOrRevisedAt: string | null;
   accessedAt: string;
