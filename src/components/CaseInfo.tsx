@@ -1,0 +1,72 @@
+import type { GameCase } from '../types';
+import { characterById } from '../data/characters';
+
+export function CaseInfo({ c, extraNotes }: { c: GameCase; extraNotes?: string[] }) {
+  const ch = characterById.get(c.characterId)!;
+  const isDesign = c.mode === 'design';
+  return (
+    <section className="panel" aria-label="人物と希望">
+      <h2 className="panel__title">
+        <span className="badge badge--lv">Lv.{c.level}</span> {c.titleJa}
+      </h2>
+      <p className="who">
+        {ch.nameJa}（{ch.gender === 'male' ? '男性' : '女性'}{ch.age}歳・架空）／{ch.skinToneJa}／{ch.hairJa}
+      </p>
+      <dl className="facts">
+        <dt>本人が気にしている特徴</dt>
+        <dd>
+          <ul>
+            {c.visibleFeaturesJa.map((f) => (
+              <li key={f}>{f}</li>
+            ))}
+          </ul>
+        </dd>
+        {c.fictionalAssessmentJa.length > 0 && (
+          <>
+            <dt>{isDesign ? '架空の診察メモ' : '手がかり（架空の記録）'}</dt>
+            <dd>
+              <ul>
+                {c.fictionalAssessmentJa.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+              <p className="muted">診察メモ・記録はゲーム用の架空設定です。画像から推測した事実ではありません。</p>
+            </dd>
+          </>
+        )}
+        {extraNotes && extraNotes.length > 0 && (
+          <>
+            <dt>追加された診察メモ（架空）</dt>
+            <dd>
+              <ul>
+                {extraNotes.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+            </dd>
+          </>
+        )}
+        <dt>{isDesign ? '希望する変化' : 'ミッション'}</dt>
+        <dd>{c.goalJa}</dd>
+        {c.preserveJa.length > 0 && (
+          <>
+            <dt>残したい個性</dt>
+            <dd>{c.preserveJa.join('、')}</dd>
+          </>
+        )}
+        {c.budgetConditionJa && (
+          <>
+            <dt>費用の条件</dt>
+            <dd>{c.budgetConditionJa}</dd>
+          </>
+        )}
+        {c.recoveryConditionJa && (
+          <>
+            <dt>回復期間の条件</dt>
+            <dd>{c.recoveryConditionJa}</dd>
+          </>
+        )}
+      </dl>
+    </section>
+  );
+}
