@@ -31,9 +31,11 @@ export function FaceIllustration({ p }: { p: FaceParams }) {
   const R = (dx: number, y: number) => `${100 + dx} ${y}`;
   const L = (dx: number, y: number) => `${100 - dx} ${y}`;
   const chin = 12 + p.chinProj * 4;
+  const chinY = 210 + p.chinProj * 8;
+  const cheekW = 51 + p.cheekFull * 4;
 
-  const faceRight = `C ${R(34, 36)} ${R(51, 62)} ${R(51, 96)} C ${R(51, 120)} ${R(52 - hollow * 3, 140)} ${R(jhw + 6, 158 + sagPx * 0.3)} C ${R(jhw + sq * 3, 172)} ${R(jhw + sq * 2, 188 + sq * 6)} ${R(jhw - 2 - (1 - sq) * 6, 196 + sagPx * 0.3)} C ${R(chin + 8, 210)} ${R(chin, 214)} 100 214`;
-  const faceLeft = `C ${L(chin, 214)} ${L(chin + 8, 210)} ${L(jhw - 2 - (1 - sq) * 6, 196 + sagPx * 0.3)} C ${L(jhw + sq * 2, 188 + sq * 6)} ${L(jhw + sq * 3, 172)} ${L(jhw + 6, 158 + sagPx * 0.3)} C ${L(52 - hollow * 3, 140)} ${L(51, 120)} ${L(51, 96)} C ${L(51, 62)} ${L(34, 36)} 100 36`;
+  const faceRight = `C ${R(34, 36)} ${R(51, 62)} ${R(51, 96)} C ${R(cheekW, 120)} ${R(cheekW + 1 - hollow * 3, 140)} ${R(jhw + 6, 158 + sagPx * 0.3)} C ${R(jhw + sq * 3, 172)} ${R(jhw + sq * 2, 188 + sq * 6)} ${R(jhw - 2 - (1 - sq) * 6, 196 + sagPx * 0.3)} C ${R(chin + 8, chinY - 4)} ${R(chin, chinY)} 100 ${chinY}`;
+  const faceLeft = `C ${L(chin, chinY)} ${L(chin + 8, chinY - 4)} ${L(jhw - 2 - (1 - sq) * 6, 196 + sagPx * 0.3)} C ${L(jhw + sq * 2, 188 + sq * 6)} ${L(jhw + sq * 3, 172)} ${L(jhw + 6, 158 + sagPx * 0.3)} C ${L(cheekW + 1 - hollow * 3, 140)} ${L(cheekW, 120)} ${L(51, 96)} C ${L(51, 62)} ${L(34, 36)} 100 36`;
   const facePath = `M 100 36 ${faceRight} ${faceLeft} Z`;
 
   const smile = p.expr === 'smile';
@@ -46,7 +48,7 @@ export function FaceIllustration({ p }: { p: FaceParams }) {
   const nasolabial = clamp((p.age - 32) / 50, 0, 0.45) + (smile ? 0.15 : 0);
 
   const lw = 15 + p.lipThick * 3 + (smile ? 3 : 0); // 唇の半幅
-  const my = 176;
+  const my = 168 + p.philtrum * 16;
   const tu = 2.5 + p.lipThick * 5.5;
   const tl = 3.5 + p.lipThick * 7.5;
   const alarHW = 9 + p.alarW * 8;
@@ -95,6 +97,12 @@ export function FaceIllustration({ p }: { p: FaceParams }) {
           <>
             <ellipse cx="68" cy="150" rx="15" ry="26" fill="#3a1f14" opacity={hollow * 0.5} filter={`url(#${uid}bl)`} transform="rotate(-14 68 150)" />
             <ellipse cx="132" cy="150" rx="15" ry="26" fill="#3a1f14" opacity={hollow * 0.5} filter={`url(#${uid}bl)`} transform="rotate(14 132 150)" />
+          </>
+        )}
+        {p.cheekFull > 0 && (
+          <>
+            <ellipse cx="68" cy="140" rx="16" ry="20" fill={skinLight} opacity={p.cheekFull * 0.5} filter={`url(#${uid}bl)`} />
+            <ellipse cx="132" cy="140" rx="16" ry="20" fill={skinLight} opacity={p.cheekFull * 0.5} filter={`url(#${uid}bl)`} />
           </>
         )}
         {/* 下顔面のたるみ（口角から顎への線・あご下の影） */}
@@ -146,7 +154,7 @@ export function FaceIllustration({ p }: { p: FaceParams }) {
           <circle cx="0" cy="-0.5" r="4.4" fill="#2a1a12" />
           <circle cx="1.4" cy="-1.8" r="1.1" fill="#fff" opacity="0.85" />
           <path d="M -13 0.5 Q 0 -10 13 0.5" stroke="#241610" strokeWidth="1.8" fill="none" strokeLinecap="round" />
-          <path d="M -11 -5 Q 0 -13 11 -5" stroke={skinDark} strokeWidth="1" fill="none" opacity="0.5" />
+          <path d="M -11 -5 Q 0 -13 11 -5" stroke={skinDark} strokeWidth="1.1" fill="none" opacity={0.12 + p.lid * 0.7} />
         </g>
       ))}
 
@@ -176,6 +184,8 @@ export function FaceIllustration({ p }: { p: FaceParams }) {
       <path d={`M ${100 - alarHW - 2} 148 Q ${100 - alarHW - 4} 156 ${100 - alarHW + 3} 157 Q 100 161 ${100 + alarHW - 3} 157 Q ${100 + alarHW + 4} 156 ${100 + alarHW + 2} 148`} stroke={skinDark} strokeWidth="1.6" fill="none" opacity="0.5" strokeLinecap="round" />
       <ellipse cx={100 - alarHW + 5} cy="156" rx="2.6" ry="1.6" fill="#3a1f14" opacity="0.55" />
       <ellipse cx={100 + alarHW - 5} cy="156" rx="2.6" ry="1.6" fill="#3a1f14" opacity="0.55" />
+
+      <ellipse cx="100" cy="150" rx={4.5 + p.tipRound * 4} ry={3.5 + p.tipRound * 3.5} fill={skinLight} opacity={0.25 + p.tipRound * 0.3} />
 
       {/* ほうれい線 */}
       {nasolabial > 0.02 && (

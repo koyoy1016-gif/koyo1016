@@ -1,6 +1,7 @@
 import type { ProgressV1 } from '../types';
 import { GAME_CASES } from '../data/cases';
 import { PROCEDURES } from '../data/procedures';
+import { CHARACTERS } from '../data/characters';
 import { IMAGE_ASSETS } from '../data/imageAssets';
 
 type Props = {
@@ -79,7 +80,9 @@ export function Home({ progress, onStart, onContinue, onDex, onSources, onDismis
       <section className="panel" aria-label="この版について">
         <h2 className="panel__title">この版について</h2>
         <ul className="plain">
-          <li>登場人物は10人、モードA・Bそれぞれ5ケース以上。ケース・施術・費用の追加はデータ追加で拡張できます。</li>
+          <li>
+            登場人物は{CHARACTERS.length}人（男女10人ずつ）、全{total}ケース（モードA {GAME_CASES.filter((c) => c.mode === 'reverse').length}問・モードB {GAME_CASES.filter((c) => c.mode === 'design').length}問）。ケース・施術・費用の追加はデータ追加で拡張できます。
+          </li>
           <li>医学情報は出典と確認状況を表示します。臨床専門家による監修は未実施です。</li>
           <li>
             顔画像は事前生成アセットの差し替え式です。{pendingImages > 0 ? `現在 ${pendingImages} 点が「画像準備中」の開発表示です。` : ''}

@@ -7,6 +7,7 @@ export type Region = {
 
 export const REGIONS: Region[] = [
   { id: 'glabella', labelJa: '眉間', hit: { left: 38, top: 24, width: 24, height: 9 } },
+  { id: 'eyelid', labelJa: '上まぶた（二重）', hit: { left: 28, top: 34, width: 44, height: 8 } },
   { id: 'eye_outer', labelJa: '目尻', hit: { left: 66, top: 33, width: 18, height: 10 } },
   { id: 'eye_lower', labelJa: '目の下', hit: { left: 30, top: 43, width: 40, height: 9 } },
   { id: 'nose', labelJa: '鼻', hit: { left: 41, top: 44, width: 18, height: 18 } },

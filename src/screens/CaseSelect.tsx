@@ -39,7 +39,7 @@ export function CaseSelect({ initialMode, progress, onPlay, onBack }: Props) {
 
       <ul className="case-list">
         {list.map((c) => {
-          const ch = characterById.get(c.characterId)!;
+          const ch = c.characterId ? characterById.get(c.characterId) ?? null : null;
           const cleared = progress.completedCaseIds.includes(c.id);
           return (
             <li key={c.id}>
@@ -54,9 +54,9 @@ export function CaseSelect({ initialMode, progress, onPlay, onBack }: Props) {
                   {c.id}　{c.titleJa}
                 </strong>
                 <span>
-                  {ch.nameJa}（{ch.gender === 'male' ? '男性' : '女性'}{ch.age}歳・架空）
+                  {ch ? `${ch.nameJa}（${ch.gender === 'male' ? '男性' : '女性'}${ch.age}歳・架空）` : '資料読解（顔画像なし）'}
                 </span>
-                <span className="muted">学ぶテーマ：{ch.themeJa}</span>
+                <span className="muted">{ch ? `学ぶテーマ：${ch.themeJa}` : '学ぶテーマ：添付文書・試験資料の読み取り'}</span>
               </button>
             </li>
           );

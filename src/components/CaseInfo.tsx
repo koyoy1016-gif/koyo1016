@@ -2,35 +2,43 @@ import type { GameCase } from '../types';
 import { characterById } from '../data/characters';
 
 export function CaseInfo({ c, extraNotes }: { c: GameCase; extraNotes?: string[] }) {
-  const ch = characterById.get(c.characterId)!;
+  const ch = c.characterId ? characterById.get(c.characterId) ?? null : null;
   const isDesign = c.mode === 'design';
   return (
     <section className="panel" aria-label="人物と希望">
       <h2 className="panel__title">
         <span className="badge badge--lv">Lv.{c.level}</span> {c.titleJa}
       </h2>
-      <p className="who">
-        {ch.nameJa}（{ch.gender === 'male' ? '男性' : '女性'}{ch.age}歳・架空）／{ch.skinToneJa}／{ch.hairJa}
-      </p>
+      {ch ? (
+        <p className="who">
+          {ch.nameJa}（{ch.gender === 'male' ? '男性' : '女性'}{ch.age}歳・架空）／{ch.skinToneJa}／{ch.hairJa}
+        </p>
+      ) : (
+        <p className="who">資料読解問題（顔画像はありません）</p>
+      )}
       <dl className="facts">
-        <dt>本人が気にしている特徴</dt>
-        <dd>
-          <ul>
-            {c.visibleFeaturesJa.map((f) => (
-              <li key={f}>{f}</li>
-            ))}
-          </ul>
-        </dd>
+        {c.visibleFeaturesJa.length > 0 && (
+          <>
+            <dt>{isDesign ? '本人が気にしている特徴' : '画像上の特徴'}</dt>
+            <dd>
+              <ul>
+                {c.visibleFeaturesJa.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+            </dd>
+          </>
+        )}
         {c.fictionalAssessmentJa.length > 0 && (
           <>
-            <dt>{isDesign ? '架空の診察メモ' : '手がかり（架空の記録）'}</dt>
+            <dt>{!ch ? '問題' : isDesign ? '架空の診察メモ' : '手がかり（架空の記録）'}</dt>
             <dd>
               <ul>
                 {c.fictionalAssessmentJa.map((f) => (
                   <li key={f}>{f}</li>
                 ))}
               </ul>
-              <p className="muted">診察メモ・記録はゲーム用の架空設定です。画像から推測した事実ではありません。</p>
+              {ch && <p className="muted">診察メモ・記録はゲーム用の架空設定です。画像から推測した事実ではありません。</p>}
             </dd>
           </>
         )}
@@ -46,7 +54,7 @@ export function CaseInfo({ c, extraNotes }: { c: GameCase; extraNotes?: string[]
             </dd>
           </>
         )}
-        <dt>{isDesign ? '希望する変化' : 'ミッション'}</dt>
+        <dt>{!ch ? 'ミッション' : isDesign ? '希望する変化' : 'ミッション'}</dt>
         <dd>{c.goalJa}</dd>
         {c.preserveJa.length > 0 && (
           <>

@@ -52,36 +52,50 @@ export function PlayReverse({ gameCase: c, nextCaseId, onCleared, onExit, onNext
     return currentStateId;
   })();
 
+  const advance = (step: ReverseHistoryStep, text: string) => {
+    const next = remaining.slice(1);
+    setSolved((list) => [...list, step]);
+    setRemaining(next);
+    setCurrentStateId(step.beforeStateId);
+    setRegion(null);
+    setProcedure(null);
+    setHintOpen(false);
+    setMsg({ kind: 'ok', text });
+    if (next.length === 0 && !clearedRef.current) {
+      clearedRef.current = true;
+      onCleared(reverseScore(wrong), (hintOpen && !alwaysHints) || attemptsLeft === 0);
+    }
+  };
+
   const check = () => {
     if (!top || !region || !procedure || done) return;
 
-    if (region === top.regionId && procedure === top.procedureId) {
-      const next = remaining.slice(1);
-      setSolved((s) => [...s, top]);
-      setRemaining(next);
-      setCurrentStateId(top.beforeStateId);
-      setRegion(null);
-      setProcedure(null);
-      setHintOpen(false);
-      const p = procedureById.get(top.procedureId)!;
+    if (top.informationInsufficient) {
+      setWrong((n) => n + 1);
       setMsg({
-        kind: 'ok',
-        text: `一致しました：${regionById.get(top.regionId)?.labelJa}／${p.nameJa}。この施術を適用する前の画像へ切り替えます。`,
+        kind: 'ng',
+        text: 'この段階は、治療名の記録がありません。外観だけで名前を決めることはできないため、施術名ではなく「情報不足」を選びましょう。（画像は変わりません）',
       });
-      if (next.length === 0 && !clearedRef.current) {
-        clearedRef.current = true;
-        onCleared(reverseScore(wrong), (hintOpen && !alwaysHints) || attemptsLeft === 0);
-      }
+      return;
+    }
+
+    const accepted = procedure === top.procedureId || (top.alsoAcceptedProcedureIds ?? []).includes(procedure);
+    if (region === top.regionId && accepted) {
+      const names = [top.procedureId, ...(top.alsoAcceptedProcedureIds ?? [])].map((id) => procedureById.get(id)?.nameJa ?? id).join('＋');
+      advance(
+        top,
+        `一致しました：${regionById.get(top.regionId)?.labelJa}／${names}${top.alsoAcceptedProcedureIds ? '（複合履歴として一括で戻ります）' : ''}。この施術を適用する前の画像へ切り替えます。`,
+      );
       return;
     }
 
     setWrong((n) => n + 1);
     const chosen = procedureById.get(procedure)!;
-    const laterMatch = remaining.slice(1).some((s) => s.procedureId === procedure);
+    const laterMatch = remaining.slice(1).some((s2) => s2.procedureId === procedure);
     let text: string;
     if (laterMatch) {
       text = `「${chosen.nameJa}」は履歴に含まれています。ただし、最後に行われた変更から逆順に解きます。ログの新しい記録を確認しましょう。`;
-    } else if (procedure === top.procedureId) {
+    } else if (accepted) {
       text = '施術の見当は合っています。ただし、その施術が作用する部位が違います。部位を選び直しましょう。';
     } else {
       text = `「${chosen.nameJa}」の作用：${chosen.mechanism.textJa} 記録の内容とは合いません。${
@@ -92,9 +106,13 @@ export function PlayReverse({ gameCase: c, nextCaseId, onCleared, onExit, onNext
   };
 
   const askInsufficient = () => {
+    if (top?.informationInsufficient) {
+      advance(top, '正解です：記録に治療名がないため、名前は特定できません。「情報不足」が答えになる場面です。この段階の変更前の画像へ切り替えます。');
+      return;
+    }
     setMsg({
       kind: 'info',
-      text: '「情報不足」を選ぶ場面は、記録も写真も足りない問題です。この問題には記録の手がかりがあります。記録カードをもう一度読んでみましょう。',
+      text: '「情報不足」を選ぶ場面は、記録も写真も足りない問題です。この段階には記録の手がかりがあります。記録カードをもう一度読んでみましょう。',
     });
   };
 
@@ -219,6 +237,15 @@ export function PlayReverse({ gameCase: c, nextCaseId, onCleared, onExit, onNext
               この巻き戻しはゲームの仕掛けです。骨切りや脂肪除去などが現実でも簡単に元に戻ることを意味しません。また、現実の他人の施術を見抜ける能力を示すものでもありません。
             </p>
             {solved.map((s) => {
+              if (s.informationInsufficient) {
+                return (
+                  <div key={s.order} className="card">
+                    <strong>{s.order}件目：治療名の記録なし（特定不可）</strong>
+                    <p>推理に使えたヒント：{s.hintCardJa}</p>
+                    <p>実際には見た目だけで特定できない点：{s.narrowingNoteJa}</p>
+                  </div>
+                );
+              }
               const p = procedureById.get(s.procedureId)!;
               return (
                 <div key={s.order} className="card">

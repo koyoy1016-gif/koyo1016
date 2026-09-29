@@ -39,7 +39,7 @@ function ClaimList({ title, claims }: { title: string; claims: Claim[] }) {
   );
 }
 
-function DoseCard({ d }: { d: DoseReference }) {
+export function DoseCard({ d }: { d: DoseReference }) {
   const range =
     d.valueMedian != null
       ? `中央値 ${d.valueMedian} ${d.unit}`

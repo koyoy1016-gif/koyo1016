@@ -14,14 +14,38 @@ describe('content validation (spec 13.3)', () => {
     for (const c of CHARACTERS) expect(c.age >= 22 && c.age <= 62).toBe(true);
   });
 
-  it('covers every minimal-version character with at least one case', () => {
+  it('has exactly 20 characters with equal gender split', () => {
+    expect(CHARACTERS.length).toBe(20);
+    expect(CHARACTERS.filter((c) => c.gender === 'male').length).toBe(10);
+    expect(CHARACTERS.filter((c) => c.gender === 'female').length).toBe(10);
+  });
+
+  it('covers every character with at least one case', () => {
     const used = new Set(GAME_CASES.map((c) => c.characterId));
     for (const c of CHARACTERS) expect(used.has(c.id)).toBe(true);
   });
 
+  it('spans all ten levels', () => {
+    const levels = new Set(GAME_CASES.map((c) => c.level));
+    for (let l = 1; l <= 10; l++) expect(levels.has(l)).toBe(true);
+  });
+
+  it('has reverse mode multi-step histories, composite and information-insufficient cases', () => {
+    const rev = GAME_CASES.filter((c) => c.mode === 'reverse');
+    expect(rev.some((c) => (c.reverseHistory?.length ?? 0) >= 3)).toBe(true);
+    expect(rev.some((c) => c.reverseHistory?.some((s) => s.alsoAcceptedProcedureIds))).toBe(true);
+    expect(rev.some((c) => c.reverseHistory?.some((s) => s.informationInsufficient))).toBe(true);
+  });
+
+  it('knowledge questions never rely on unverified or Korean dose data', () => {
+    for (const c of GAME_CASES.filter((x) => x.characterId === null)) {
+      expect(c.doseReferenceIds?.some((id) => id.startsWith('DOSE-KR'))).toBe(false);
+    }
+  });
+
   it('has at least 5 cases per mode', () => {
-    expect(GAME_CASES.filter((c) => c.mode === 'reverse').length).toBeGreaterThanOrEqual(5);
-    expect(GAME_CASES.filter((c) => c.mode === 'design').length).toBeGreaterThanOrEqual(5);
+    expect(GAME_CASES.filter((c) => c.mode === 'reverse').length).toBeGreaterThanOrEqual(10);
+    expect(GAME_CASES.filter((c) => c.mode === 'design').length).toBeGreaterThanOrEqual(10);
   });
 
   it('includes the four required branches: mismatch, cheek hollowing, lip exceed, defer', () => {

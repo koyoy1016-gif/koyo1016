@@ -1,6 +1,6 @@
 import { CHARACTERS } from '../data/characters';
 import { GAME_CASES } from '../data/cases';
-import { DOSE_REFERENCES } from '../data/doseReferences';
+import { DOSE_REFERENCES, doseReferenceById } from '../data/doseReferences';
 import { imageAssetByStateId } from '../data/imageAssets';
 import { PRICE_EXAMPLES } from '../data/priceExamples';
 import { PROCEDURES, procedureById } from '../data/procedures';
@@ -61,7 +61,7 @@ export const validateContent = (): string[] => {
 
   // ケース
   const checkOutcome = (caseId: string, o: ChoiceOutcome) => {
-    if (!imageAssetByStateId.has(o.targetStateId)) issues.push(`${caseId}/${o.choiceId}: 画像状態 ${o.targetStateId} が未登録`);
+    if (o.targetStateId !== '' && !imageAssetByStateId.has(o.targetStateId)) issues.push(`${caseId}/${o.choiceId}: 画像状態 ${o.targetStateId} が未登録`);
     if (!o.feedbackJa) issues.push(`${caseId}/${o.choiceId}: 解説がない`);
     if (o.procedureId && !procedureById.has(o.procedureId)) issues.push(`${caseId}/${o.choiceId}: 施術 ${o.procedureId} が未登録`);
     // 未確認施術を唯一の治療正解にしない
@@ -71,8 +71,17 @@ export const validateContent = (): string[] => {
     }
     for (const s of o.rationaleSourceIds) if (!sourceIds.has(s)) issues.push(`${caseId}/${o.choiceId}: 出典 ${s} が未登録`);
   };
+  const characterIds = new Set(CHARACTERS.map((c) => c.id));
   for (const c of GAME_CASES) {
-    if (!imageAssetByStateId.has(c.initialStateId)) issues.push(`${c.id}: 初期画像 ${c.initialStateId} が未登録`);
+    if (c.characterId !== null && !characterIds.has(c.characterId)) issues.push(`${c.id}: 人物 ${c.characterId} が未登録`);
+    // 3. 資料読解：確認済みで、正解根拠に使ってよい用量のみ
+    for (const did of c.doseReferenceIds ?? []) {
+      const d = doseReferenceById.get(did);
+      if (!d) issues.push(`${c.id}: 用量 ${did} が未登録`);
+      else if (!d.usableAsQuizAnswer || d.verification !== 'verified_document') issues.push(`${c.id}: 未確認・照合待ちの用量 ${did} が出題に使われている`);
+    }
+    if (c.characterId === null && (c.doseReferenceIds ?? []).length === 0) issues.push(`${c.id}: 資料読解なのに資料カードがない`);
+    if (c.characterId !== null && !imageAssetByStateId.has(c.initialStateId)) issues.push(`${c.id}: 初期画像 ${c.initialStateId} が未登録`);
     if (c.mode === 'design') {
       const all = [...c.outcomes, ...(c.outcomesAfterInfo ?? [])];
       if (c.outcomes.length < 3) issues.push(`${c.id}: 選択肢が少ない`);
@@ -85,9 +94,15 @@ export const validateContent = (): string[] => {
       // 5. 正解が保存済みの正しい直前状態へ戻る
       steps.forEach((s, i) => {
         if (i > 0 && s.beforeStateId !== steps[i - 1].afterStateId) issues.push(`${c.id}: 履歴の画像状態が連鎖していない（order ${s.order}）`);
-        if (!procedureById.has(s.procedureId)) issues.push(`${c.id}: 施術 ${s.procedureId} が未登録`);
+        if (!s.informationInsufficient) {
+          if (!procedureById.has(s.procedureId)) issues.push(`${c.id}: 施術 ${s.procedureId} が未登録`);
+          if (!c.allowedProcedureIds.includes(s.procedureId)) issues.push(`${c.id}: 正解の施術が選択肢に含まれない`);
+        }
+        for (const extra of s.alsoAcceptedProcedureIds ?? []) {
+          if (!procedureById.has(extra)) issues.push(`${c.id}: 複合履歴の施術 ${extra} が未登録`);
+          if (!c.allowedProcedureIds.includes(extra)) issues.push(`${c.id}: 複合履歴の施術 ${extra} が選択肢に含まれない`);
+        }
         if (!regionIds.has(s.regionId)) issues.push(`${c.id}: 部位 ${s.regionId} が未登録`);
-        if (!c.allowedProcedureIds.includes(s.procedureId)) issues.push(`${c.id}: 正解の施術が選択肢に含まれない`);
         for (const st of [s.beforeStateId, s.afterStateId]) if (!imageAssetByStateId.has(st)) issues.push(`${c.id}: 画像状態 ${st} が未登録`);
       });
       const last = steps[steps.length - 1];

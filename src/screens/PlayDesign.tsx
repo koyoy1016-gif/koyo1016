@@ -4,7 +4,8 @@ import { procedureById } from '../data/procedures';
 import { CaseInfo } from '../components/CaseInfo';
 import { FaceImage } from '../components/FaceImage';
 import { ClassificationBadge, SourceChips } from '../components/Badges';
-import { ProcedureDetail } from '../components/ProcedureDetail';
+import { DoseCard, ProcedureDetail } from '../components/ProcedureDetail';
+import { doseReferenceById } from '../data/doseReferences';
 import { ScorePanel } from '../components/ScorePanel';
 import { totalScore } from '../lib/scoring';
 
@@ -34,6 +35,8 @@ export function PlayDesign({ gameCase: c, nextCaseId, onCleared, onExit, onNext 
 
   const outcomes = infoAdded && c.outcomesAfterInfo ? c.outcomesAfterInfo : c.outcomes;
   const alwaysHints = c.level === 1;
+  const knowledgeOnly = c.characterId === null;
+  const doseCards = (c.doseReferenceIds ?? []).map((id) => doseReferenceById.get(id)).filter((d) => !!d);
 
   const plans = useMemo(() => {
     const seen = new Map<string, ChoiceOutcome[]>();
@@ -80,8 +83,18 @@ export function PlayDesign({ gameCase: c, nextCaseId, onCleared, onExit, onNext 
   return (
     <div className="play">
       <div className="play__face">
-        <FaceImage stateId={shownState} />
-        {result && (
+        {knowledgeOnly ? (
+          <section className="panel" aria-label="資料カード">
+            <h2 className="panel__title">資料カード</h2>
+            <p className="muted">数値は資料カードからデータ参照しています。個人の適量の推奨ではありません。</p>
+            {doseCards.map((d) => (
+              <DoseCard key={d!.id} d={d!} />
+            ))}
+          </section>
+        ) : (
+          <FaceImage stateId={shownState} />
+        )}
+        {result && !knowledgeOnly && (
           <details className="compare">
             <summary>はじめの顔と並べて比べる</summary>
             <div className="compare__row">

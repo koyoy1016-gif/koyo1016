@@ -201,13 +201,20 @@ export type ReverseHistoryStep = {
   order: number;
   hintCardJa: string; // 外観以外の識別ヒント（候補を絞る情報カード）
   narrowingNoteJa: string; // 見た目が似る施術の絞り込み説明
+  /** 複合履歴：どちらを選んでも一括で戻る、同時に登録された施術ID */
+  alsoAcceptedProcedureIds?: string[];
+  /** 記録が足りない段階：正解は「情報不足」を選ぶこと */
+  informationInsufficient?: boolean;
 };
 
 export type GameMode = 'reverse' | 'design';
 
 export type GameCase = {
   id: string;
-  characterId: string;
+  /** 顔を出さない資料読解問題（添付文書カード等）は null */
+  characterId: string | null;
+  /** 資料読解問題で表示する用量資料（数値は問題文に複製せずデータ参照する） */
+  doseReferenceIds?: string[];
   level: number;
   mode: GameMode;
   titleJa: string;
