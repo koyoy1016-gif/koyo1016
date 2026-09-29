@@ -1,6 +1,8 @@
 import { imageAssetByStateId } from '../data/imageAssets';
 import { REGIONS } from '../data/regions';
 import { characterById } from '../data/characters';
+import { paramsForState } from '../data/faceStyles';
+import { FaceIllustration } from './FaceIllustration';
 
 type Props = {
   stateId: string;
@@ -18,6 +20,7 @@ type Props = {
 export function FaceImage({ stateId, selectableRegions, selectedRegionId, onSelectRegion, compact }: Props) {
   const asset = imageAssetByStateId.get(stateId);
   const character = asset ? characterById.get(asset.characterId) : undefined;
+  const illustration = asset?.src ? null : paramsForState(stateId);
 
   return (
     <figure className={`face ${compact ? 'face--compact' : ''}`}>
@@ -26,6 +29,10 @@ export function FaceImage({ stateId, selectableRegions, selectedRegionId, onSele
         <div className="face__fade" key={stateId}>
           {asset?.src ? (
             <img className="face__img" src={asset.src} alt={asset.altJa} draggable={false} />
+          ) : illustration ? (
+            <div className="face__illust" role="img" aria-label={`仮イラスト：${asset?.altJa ?? stateId}`}>
+              <FaceIllustration p={illustration} />
+            </div>
           ) : (
             <Placeholder
               name={character ? `${character.nameJa}（架空・${character.age}歳）` : '架空の人物'}
@@ -52,9 +59,13 @@ export function FaceImage({ stateId, selectableRegions, selectedRegionId, onSele
         )}
       </div>
       <figcaption className="face__caption">
-        <span className="badge badge--ai">AI生成・架空の変化例</span>
+        {asset?.src ? (
+          <span className="badge badge--ai">AI生成・架空の変化例</span>
+        ) : (
+          <span className="badge badge--ai">架空の仮イラスト</span>
+        )}
         <span className="face__time">{asset?.timeLabelJa ?? ''}</span>
-        {asset && asset.status === 'planned' && <span className="badge badge--dev">画像準備中</span>}
+        {asset && asset.status === 'planned' && <span className="badge badge--dev">画像準備中（開発用の仮イラスト）</span>}
       </figcaption>
     </figure>
   );
