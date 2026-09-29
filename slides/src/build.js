@@ -3,7 +3,7 @@ const pptxgen = require("pptxgenjs");
 const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE"; // 13.33 x 7.5
 
-const TOTAL = 37;
+const TOTAL = 38;
 let PN = 18;
 function next() { return ++PN; }
 const FONT = "Yu Gothic";
@@ -51,7 +51,9 @@ function ML(lines) {
 }
 
 function T(slide, text, o) {
-  slide.addText(text, { fontFace: FONT, color: C.text, fontSize: 11, valign: "top", margin: 0.04, isTextBox: true, ...o });
+  const fs = o.fontSize || 11;
+  const fsz = fs <= 10.5 ? fs + 0.5 : fs;
+  slide.addText(text, { fontFace: FONT, color: C.text, valign: "top", margin: 0.04, isTextBox: true, ...o, fontSize: fsz });
 }
 function R(slide, x, y, w, h, fill, o = {}) {
   slide.addShape(o.round ? pres.shapes.ROUNDED_RECTANGLE : pres.shapes.RECTANGLE, {
@@ -116,7 +118,7 @@ function std(num, part, title, sub) {
 }
 // 表（先頭行を見出しに）
 function table(slide, rows, o) {
-  const fs = o.fs || 10;
+  const fs = (o.fs || 10) + 0.5;
   const data = rows.map((r, ri) => r.map((cell, ci) => {
     const isHead = ri === 0 && !o.noHead;
     const txt = typeof cell === "string" ? (o.math ? M(cell) : cell) : cell.t;
@@ -158,7 +160,7 @@ function miniPlan(s, cx, cy, u, arr, o = {}) {
 }
 
 // PART 7 の話の流れ（今どこにいるか）
-const STORY = ["① なぜ6,561通り？", "② 補間の考え方・1万通り", "③ 具体例（2棟・16点）", "④ 4棟なら256点", "⑤ 計算時間", "⑥ 17変数では別の方法へ"];
+const STORY = ["① なぜ6,561通り", "② 考え方・1万通り", "③ 例：隅を探す", "④ 例：16マス", "⑤ 4棟なら256", "⑥ 計算時間", "⑦ 17変数は別の方法"];
 function story(s, idx) {
   const w = 2.52, gap = 0.44 / 4;
   STORY.forEach((t, i) => {
@@ -166,7 +168,7 @@ function story(s, idx) {
     const on = i === idx, done = i < idx;
     const step = 12.35 / STORY.length;
     s.addShape(i === 0 ? pres.shapes.PENTAGON : pres.shapes.CHEVRON, { x: 0.5 + i * step, y: 1.16, w: step + 0.08, h: 0.36, fill: { color: on ? C.orange : done ? "F6D9C0" : C.panel2 }, line: { type: "none" } });
-    T(s, t, { x: 0.5 + i * step + (i === 0 ? 0.08 : 0.2), y: 1.16, w: step - 0.25, h: 0.36, fontSize: 9, bold: true, color: on ? C.white : done ? C.dorange : C.muted, align: "center", valign: "middle", margin: 0 });
+    T(s, t, { x: 0.5 + i * step + (i === 0 ? 0.08 : 0.2), y: 1.16, w: step - 0.25, h: 0.36, fontSize: 8.5, bold: true, color: on ? C.white : done ? C.dorange : C.muted, align: "center", valign: "middle", margin: 0 });
   });
 }
 
@@ -197,8 +199,8 @@ function story(s, idx) {
   const parts = [
     ["PART 5", "データと計算過程の整理", "学習16・検証8・テスト12などの役割と、Σを使った計算式", "p.20–24", "Q1"],
     ["PART 6", "最終目標ツールの変数", "平面図・立体図で17個の変数の位置と、0/1変数を使う理由", "p.25–28", "Q2"],
-    ["PART 7", "4方向での線形補間", "なぜ6,561通り？ → 補間の計算の流れと例 → 計算時間 → 17変数では別の方法へ", "p.29–34", "Q3"],
-    ["PART 8", "代案：空の遮られ方", "線形補間でうまくいかない場合の方法の概要（詳細は来週）", "p.35–36", "Q3"],
+    ["PART 7", "4方向での線形補間", "なぜ6,561通り？ → 補間の考え方と具体例 → 計算時間 → 17変数では別の方法へ", "p.29–35", "Q3"],
+    ["PART 8", "代案：空の遮られ方", "線形補間でうまくいかない場合の方法の概要（詳細は来週）", "p.36–37", "Q3"],
   ];
   parts.forEach((p, i) => {
     const x = 0.7 + i * 3.03, y = 3.75, w = 2.83, h = 2.65;
@@ -571,7 +573,7 @@ function story(s, idx) {
     poly(s, [Pj(x1, y0, 0), Pj(x1, y1, 0), Pj(x1, y1, h), Pj(x1, y0, h)], { fill: cE, line: C.white, lw: 0.5 });
   };
   // 地面の目安
-  poly(s, [Pj(-110, -110, 0), Pj(120, -110, 0), Pj(120, 110, 0), Pj(-110, 110, 0)], { fill: "E6EAEF" });
+  poly(s, [Pj(-105, -35, 0), Pj(-35, -110, 0), Pj(35, -110, 0), Pj(115, -35, 0), Pj(115, 35, 0), Pj(35, 105, 0), Pj(-35, 105, 0), Pj(-105, 35, 0)], { fill: "E6EAEF" });
   // 北：なし（点線）
   poly(s, [Pj(-25, 45, 0), Pj(25, 45, 0), Pj(25, 95, 0), Pj(-25, 95, 0)], { line: C.muted, dash: "dash", lw: 1 });
   // 西の建物
@@ -614,7 +616,8 @@ function story(s, idx) {
   T(s, "南面", { x: sl[0] - 0.4, y: sl[1] - 0.12, w: 0.8, h: 0.24, fontSize: 10, bold: true, color: C.navy, align: "center", margin: 0 });
   const el = Pj(25, 0, 30);
   T(s, "東面", { x: el[0] - 0.4, y: el[1] - 0.12, w: 0.8, h: 0.24, fontSize: 10, bold: true, color: C.navy, align: "center", margin: 0 });
-  T(s, M("西の建物\nA_{西}・D_{西}"), { x: 0.6, y: 2.75, w: 1.3, h: 0.45, fontSize: 9, bold: true, color: C.teal });
+  T(s, "西の建物", { x: 0.6, y: 2.72, w: 1.3, h: 0.24, fontSize: 9, bold: true, color: C.teal });
+  T(s, M("A_{西}・D_{西}"), { x: 0.6, y: 2.95, w: 1.3, h: 0.26, fontSize: 9, bold: true, color: C.teal });
   T(s, M("北は建物なし：s_{北}＝0\n（点線は置く場合の位置）"), { x: 4.95, y: 2.0, w: 2.4, h: 0.45, fontSize: 9, bold: true, color: C.muted });
   // 北矢印
   const n0 = [6.5, 6.4], n1 = [6.5 + 0.7071 * 0.5, 6.4 - 0.3536 * 0.5];
@@ -762,7 +765,7 @@ function story(s, idx) {
   R(s, gx, gy, gs, gs, C.white, { line: "C9D0D8" });
   for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) dot(s, gx + 0.15 + i * 0.25, gy + gs - 0.15 - j * 0.25, 0.11, C.navy, "RECTANGLE");
   T(s, [{ text: "1方向の選び方 ＝ ", options: { color: C.navy } }, { text: "9通り", options: { color: C.dorange } }], { x: 1.8, y: 2.1, w: 4.7, h: 0.32, fontSize: 13, bold: true });
-  T(s, "高さ3通り（25・50・100m）× 距離3通り（10・25・100m）", { x: 1.8, y: 2.44, w: 4.7, h: 0.26, fontSize: 10, color: C.text });
+  T(s, "高さ3通り（25・50・100m）× 距離3通り（10・25・100m）", { x: 1.8, y: 2.44, w: 4.75, h: 0.26, fontSize: 9, color: C.text });
   T(s, "南1棟で表を作ったときと同じ考え方", { x: 1.8, y: 2.7, w: 4.7, h: 0.26, fontSize: 9.5, color: C.muted });
   const chain = [[[1, 0, 0, 0], "北だけ", "9"], [[1, 1, 0, 0], "北＋東", "81"], [[1, 1, 1, 0], "北＋東＋南", "729"], [[1, 1, 1, 1], "4方向すべて", "6,561"]];
   chain.forEach((c, i) => {
@@ -894,101 +897,167 @@ function story(s, idx) {
 }
 
 // =====================================================================
-// P7-2b: 具体例（東と南に建物）で壁の計算を追う
+// P7-2b: 具体例①：建物ごとに「隅」を探す
 // =====================================================================
 {
-  const s = std(next(), 7, "具体例：東と南に建物があるとき、南面・帯1をどう計算するか");
+  const s = std(next(), 7, "具体例①：南と東の建物それぞれで、入力を囲む「4つの隅」を探す");
   story(s, 2);
-  // 平面図
-  R(s, 0.5, 1.7, 4.6, 2.55, C.panel, { round: true, rr: 0.06 });
-  T(s, "上から見た図（入力）", { x: 0.65, y: 1.75, w: 3, h: 0.26, fontSize: 10, bold: true, color: C.navy });
-  const pk = 0.0112, pcx = 2.45, pcy = 3.08;
+  // 左：入力の配置
+  R(s, 0.5, 1.7, 3.9, 5.2, C.panel, { round: true, rr: 0.06 });
+  T(s, "入力（知りたい配置）", { x: 0.65, y: 1.75, w: 3.6, h: 0.26, fontSize: 10.5, bold: true, color: C.navy });
+  const pk = 0.0105, pcx = 2.3, pcy = 3.0;
   const PP = (x, y) => [pcx + x * pk, pcy - y * pk];
-  const box2 = (x0, x1, y0, y1, fill, dash) => { const a = PP(x0, y1); if (dash) R(s, a[0], a[1], (x1 - x0) * pk, (y1 - y0) * pk, C.white, { line: C.faint, dash: "dash" }); else R(s, a[0], a[1], (x1 - x0) * pk, (y1 - y0) * pk, fill); };
-  box2(-25, 25, -25, 25, C.navy);
-  box2(-25, 25, -90, -40, C.teal);            // 南 A35 D15
-  box2(45, 95, -25, 25, C.orange);            // 東 A40 D20
-  box2(-25, 25, 40, 90, null, true);          // 北 なし
-  box2(-90, -40, -25, 25, null, true);        // 西 なし
-  const sw = PP(-25, -25); R(s, sw[0], sw[1] - 0.03, 50 * pk, 0.06, C.red);
+  const bx = (x0, x1, y0, y1, fill, dash) => { const a = PP(x0, y1); if (dash) R(s, a[0], a[1], (x1 - x0) * pk, (y1 - y0) * pk, C.white, { line: C.faint, dash: "dash" }); else R(s, a[0], a[1], (x1 - x0) * pk, (y1 - y0) * pk, fill); };
+  bx(-25, 25, -25, 25, C.navy);
+  bx(-25, 25, -90, -40, C.teal);
+  bx(45, 95, -25, 25, C.orange);
+  bx(-25, 25, 40, 90, null, true);
+  bx(-90, -40, -25, 25, null, true);
+  const swp = PP(-25, -25); R(s, swp[0], swp[1] - 0.035, 50 * pk, 0.07, C.red);
   T(s, "中央", { x: PP(-25, 25)[0], y: PP(-25, 25)[1], w: 50 * pk, h: 50 * pk, fontSize: 8, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
-  T(s, "南\nA35m\nD15m", { x: PP(-25, -40)[0], y: PP(-25, -40)[1], w: 50 * pk, h: 50 * pk, fontSize: 7, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
-  T(s, "東\nA40m\nD20m", { x: PP(45, 25)[0], y: PP(45, 25)[1], w: 50 * pk, h: 50 * pk, fontSize: 7, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
-  T(s, "北：なし s＝0", { x: PP(25, 90)[0] + 0.05, y: PP(25, 90)[1] + 0.1, w: 1.2, h: 0.22, fontSize: 8, color: C.muted });
-  T(s, "西：なし s＝0", { x: PP(-90, 25)[0], y: PP(-90, 25)[1] - 0.26, w: 1.2, h: 0.22, fontSize: 8, color: C.muted });
-  T(s, "━ 計算する壁：\n南面・帯1（0〜10m）", { x: 3.55, y: 3.55, w: 1.5, h: 0.5, fontSize: 7.5, bold: true, color: C.red });
-  // 立体図
-  R(s, 0.5, 4.35, 4.6, 2.55, C.panel, { round: true, rr: 0.06 });
-  T(s, "斜めから見た図（どの壁の値か）", { x: 0.65, y: 4.4, w: 3.5, h: 0.26, fontSize: 10, bold: true, color: C.navy });
-  const k = 0.02, X0 = 2.8, Y0 = 5.95;
+  T(s, "南\n35m\n15m", { x: PP(-25, -40)[0], y: PP(-25, -40)[1], w: 50 * pk, h: 50 * pk, fontSize: 7, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+  T(s, "東\n40m\n20m", { x: PP(45, 25)[0], y: PP(45, 25)[1], w: 50 * pk, h: 50 * pk, fontSize: 7, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+  T(s, "北：なし", { x: PP(25, 90)[0] + 0.05, y: PP(25, 90)[1] + 0.12, w: 0.9, h: 0.22, fontSize: 8, color: C.muted });
+  T(s, "西：なし", { x: PP(-90, 25)[0], y: PP(-90, 25)[1] - 0.25, w: 0.9, h: 0.22, fontSize: 8, color: C.muted });
+  T(s, "━ 計算する壁：南面・帯1", { x: 0.65, y: 4.05, w: 3.6, h: 0.24, fontSize: 9, bold: true, color: C.red });
+  // 立体
+  const k = 0.017, X0 = 2.45, Y0 = 5.85;
   const Pj = (x, y, z) => [X0 + k * (x + y) * 0.7071, Y0 + k * (-z * 0.95 + (x - y) * 0.3536)];
-  const boxD = (x0, x1, y0, y1, h, cTop, cS, cE) => {
-    poly(s, [Pj(x0, y0, h), Pj(x1, y0, h), Pj(x1, y1, h), Pj(x0, y1, h)], { fill: cTop, line: C.white, lw: 0.5 });
-    poly(s, [Pj(x0, y0, 0), Pj(x1, y0, 0), Pj(x1, y0, h), Pj(x0, y0, h)], { fill: cS, line: C.white, lw: 0.5 });
-    poly(s, [Pj(x1, y0, 0), Pj(x1, y1, 0), Pj(x1, y1, h), Pj(x1, y0, h)], { fill: cE, line: C.white, lw: 0.5 });
-  };
-  poly(s, [Pj(-25, 40, 0), Pj(25, 40, 0), Pj(25, 90, 0), Pj(-25, 90, 0)], { line: C.muted, dash: "dash", lw: 0.75 });
-  poly(s, [Pj(-90, -25, 0), Pj(-40, -25, 0), Pj(-40, 25, 0), Pj(-90, 25, 0)], { line: C.muted, dash: "dash", lw: 0.75 });
-  // 中央：南面の帯を描く
   poly(s, [Pj(-25, -25, 50), Pj(25, -25, 50), Pj(25, 25, 50), Pj(-25, 25, 50)], { fill: "4A5F85", line: C.white, lw: 0.5 });
   for (let b = 0; b < 5; b++) {
     poly(s, [Pj(-25, -25, b * 10), Pj(25, -25, b * 10), Pj(25, -25, b * 10 + 10), Pj(-25, -25, b * 10 + 10)], { fill: b === 0 ? C.red : "B8C3D6", line: C.white, lw: 0.75 });
     poly(s, [Pj(25, -25, b * 10), Pj(25, 25, b * 10), Pj(25, 25, b * 10 + 10), Pj(25, -25, b * 10 + 10)], { fill: "8FA0BC", line: C.white, lw: 0.75 });
   }
   [[[-25, -90, 35], [25, -90, 35], [25, -40, 35], [-25, -40, 35]], [[-25, -90, 0], [25, -90, 0], [25, -90, 35], [-25, -90, 35]], [[25, -90, 0], [25, -40, 0], [25, -40, 35], [25, -90, 35]]].forEach(f => poly(s, f.map(p => Pj(...p)), { fill: C.teal, tr: 70, line: C.teal, lw: 1 }));
-  boxD(45, 95, -25, 25, 40, "F2C49B", "E8934D", "C56A2C");
-  T(s, "南の建物（透かして表示）", { x: Pj(-25, -90, 0)[0] - 0.2, y: Pj(-25, -90, 0)[1] + 0.02, w: 1.9, h: 0.2, fontSize: 7.5, bold: true, color: C.teal });
+  [[[45, -25, 40], [95, -25, 40], [95, 25, 40], [45, 25, 40]], [[45, -25, 0], [95, -25, 0], [95, -25, 40], [45, -25, 40]], [[95, -25, 0], [95, 25, 0], [95, 25, 40], [95, -25, 40]]].forEach((f, i) => poly(s, f.map(p => Pj(...p)), { fill: ["F2C49B", "E8934D", "C56A2C"][i], line: C.white, lw: 0.5 }));
   const lb = Pj(-25, -25, 5);
-  T(s, "南面・帯1", { x: lb[0] - 1.3, y: lb[1] - 0.75, w: 1.0, h: 0.22, fontSize: 8.5, bold: true, color: C.red });
-  line(s, lb[0] - 0.4, lb[1] - 0.55, lb[0] + 0.05, lb[1] - 0.05, { color: C.red, width: 0.75 });
-  T(s, "他の19個（4面×5帯）も同じ手順", { x: 2.9, y: 6.62, w: 2.1, h: 0.22, fontSize: 8, color: C.muted, align: "right" });
+  T(s, "南面・帯1", { x: 0.6, y: lb[1] - 0.85, w: 1.0, h: 0.22, fontSize: 8.5, bold: true, color: C.red });
+  line(s, 1.2, lb[1] - 0.63, lb[0] + 0.1, lb[1] - 0.05, { color: C.red, width: 0.75 });
+  T(s, "南の建物は透かして表示", { x: 0.65, y: 6.62, w: 3.6, h: 0.22, fontSize: 8, color: C.muted });
 
-  // 右：手順
+  // 右：建物ごとの隅
+  const panel = (x, name, col, colL, inA, inD, tA, tD, ws, side) => {
+    const w = 4.05;
+    R(s, x, 1.7, w, 4.55, colL, { round: true, rr: 0.06 });
+    R(s, x, 1.7, w, 0.4, col, { round: true, rr: 0.06 });
+    T(s, `${name}の建物　入力：高さ${inA}m・隙間${inD}m`, { x: x + 0.12, y: 1.7, w: w - 0.24, h: 0.4, fontSize: 11, bold: true, color: C.white, valign: "middle" });
+    // 格子（横：隙間D，縦：高さA）
+    const gx = x + 1.1, gy = 2.4, gs = 1.55;
+    R(s, gx, gy, gs, gs, C.white, { line: "C9D0D8" });
+    const cor = [[0, 0, "(25,10)", ws[0]], [1, 0, "(25,25)", ws[1]], [0, 1, "(50,10)", ws[2]], [1, 1, "(50,25)", ws[3]]]; // [dIdx, aIdx]
+    cor.forEach(c => {
+      const cx = gx + c[0] * gs, cy = gy + gs - c[1] * gs;
+      dot(s, cx, cy, 0.2, col, "RECTANGLE");
+      const lx = c[0] ? cx + 0.12 : cx - 1.02, ly = c[1] ? cy - 0.3 : cy - 0.02;
+      T(s, [{ text: c[2], options: { bold: true, color: C.navy, breakLine: true } }, { text: "重み " + c[3], options: { bold: true, color: C.dorange } }], { x: lx, y: ly, w: 0.9, h: 0.4, fontSize: 8.5, align: c[0] ? "left" : "right", margin: 0 });
+    });
+    const sx = gx + tD * gs, sy = gy + gs - tA * gs;
+    line(s, sx, sy, sx, gy + gs, { color: C.red, width: 0.75, dash: "dash" });
+    line(s, gx, sy, sx, sy, { color: C.red, width: 0.75, dash: "dash" });
+    dot(s, sx, sy, 0.26, C.red, "STAR_5_POINT");
+    T(s, "入力", { x: sx - 0.3, y: sy - 0.36, w: 0.6, h: 0.2, fontSize: 8.5, bold: true, color: C.red, align: "center" });
+    T(s, "隙間 D →", { x: gx, y: gy + gs + 0.25, w: gs, h: 0.2, fontSize: 8, color: C.muted, align: "center" });
+    T(s, "高さ A ↑", { x: gx - 0.95, y: gy + gs / 2 - 0.1, w: 0.8, h: 0.2, fontSize: 8, color: C.muted, align: "right" });
+    T(s, `高さの位置 ${tA === 0.4 ? "0.4" : "0.6"}，隙間の位置 ${tD < 0.5 ? "1/3" : "2/3"}`, { x: x + 0.12, y: 4.45, w: w - 0.24, h: 0.22, fontSize: 8.5, color: C.text, align: "center" });
+    // 4つの隅を横から見た図
+    T(s, "4つの隅は、それぞれこんな配置（横から見た図）", { x: x + 0.12, y: 4.7, w: w - 0.24, h: 0.22, fontSize: 8.5, bold: true, color: C.navy });
+    cor.forEach((c, i) => {
+      const ix = x + 0.12 + i * 0.97, iy = 4.95;
+      R(s, ix, iy, 0.9, 1.22, C.white, { round: true, rr: 0.04 });
+      const A = c[1] ? 50 : 25, D = c[0] ? 25 : 10, v = 0.011, g = 0.012, bw = 0.24, base = iy + 0.72;
+      line(s, ix + 0.03, base, ix + 0.87, base, { color: C.muted, width: 0.5 });
+      const nx = side === "L" ? ix + 0.06 : ix + 0.06 + bw + D * g;
+      const cxb = side === "L" ? ix + 0.06 + bw + D * g : ix + 0.06;
+      R(s, cxb, base - 50 * v, bw, 50 * v, C.navy);
+      R(s, nx, base - A * v, bw, A * v, col);
+      T(s, [{ text: c[2], options: { bold: true, color: C.navy, breakLine: true } }, { text: "重み " + c[3], options: { bold: true, color: C.dorange } }], { x: ix, y: base + 0.02, w: 0.9, h: 0.46, fontSize: 8, align: "center", margin: 0 });
+    });
+  };
+  panel(4.6, "南", C.teal, "E6F0F1", 35, 15, 0.4, 1 / 3, ["0.400", "0.200", "0.267", "0.133"], "L");
+  panel(8.8, "東", C.orange, "FBEFE3", 40, 20, 0.6, 2 / 3, ["0.133", "0.267", "0.200", "0.400"], "R");
+  R(s, 4.6, 6.38, 8.25, 0.52, C.navy, { round: true, rr: 0.05 });
   T(s, [
-    { text: "① 有無 ", options: { bold: true, color: C.teal } },
-    { text: "s＝(北0, 東1, 南1, 西0) → 16個の表のうち「東と南がある表」を使う。補間する変数は A東・D東・A南・D南 の4つ → 使う点は 2⁴＝16", options: {} },
-  ], { x: 5.35, y: 1.7, w: 7.5, h: 0.5, fontSize: 9.5, color: C.text });
-  T(s, [
-    { text: "② 位置 t ", options: { bold: true, color: C.teal } },
-    { text: "（格子：高さ 25・50m，隙間 10・25m）南：高さ (35−25)÷25＝0.4，隙間 (15−10)÷15＝1/3 ／ 東：高さ 0.6，隙間 2/3", options: {} },
-  ], { x: 5.35, y: 2.2, w: 7.5, h: 0.5, fontSize: 9.5, color: C.text });
-  T(s, "③ 16点の重み ＝ 南の隅の重み × 東の隅の重み（1マス＝東と南を同時に置いた1配置）", { x: 5.35, y: 2.72, w: 7.5, h: 0.26, fontSize: 10, bold: true, color: C.navy });
+    { text: "隅＝入力を囲む「計算済みの条件（高さ, 隙間）」。", options: { color: C.white, bold: true } },
+    { text: "重み＝高さの割合×隙間の割合（近い隅ほど大きい）。南4つ×東4つ → 16マス（次のページ）", options: { color: C.orange, bold: true } },
+  ], { x: 4.72, y: 6.38, w: 8.05, h: 0.52, fontSize: 9.5, valign: "middle" });
+  s.addNotes("");
+}
+
+// =====================================================================
+// P7-2c: 具体例②：1マス＝南の隅と東の隅を同時に置いた配置
+// =====================================================================
+{
+  const s = std(next(), 7, "具体例②：16マスの1つ1つが「南と東を同時に置いた配置」");
+  story(s, 3);
   const sw4 = [["(25,10)", 0.4], ["(25,25)", 0.2], ["(50,10)", 0.2667], ["(50,25)", 0.1333]];
   const ew4 = [["(25,10)", 0.1333], ["(25,25)", 0.2667], ["(50,10)", 0.2], ["(50,25)", 0.4]];
-  const mx = 5.35, my = 3.02, c0 = 1.55, cw = 1.2, rh = 0.3;
-  R(s, mx, my, c0, rh * 2, C.navy);
-  T(s, "南の隅 ＼ 東の隅", { x: mx, y: my, w: c0, h: rh * 2, fontSize: 8.5, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+  const mx = 0.5, my = 2.5, c0 = 1.55, cw = 1.3, rh = 0.46;
+  T(s, "東の建物の隅（前のページ右の4つ）→", { x: mx + c0, y: 1.68, w: cw * 4, h: 0.26, fontSize: 10, bold: true, color: C.orange, align: "center" });
+  T(s, "南の建物の隅\n（前のページ左）↓", { x: mx, y: 1.9, w: c0, h: 0.56, fontSize: 9, bold: true, color: C.teal, align: "center", valign: "middle" });
   ew4.forEach((e, j) => {
-    R(s, mx + c0 + j * cw, my, cw - 0.02, rh * 2, C.orange);
-    T(s, [{ text: e[0], options: { breakLine: true } }, { text: "×" + e[1].toFixed(3), options: { fontSize: 8.5 } }], { x: mx + c0 + j * cw, y: my, w: cw - 0.02, h: rh * 2, fontSize: 9.5, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+    const x = mx + c0 + j * cw;
+    R(s, x, 1.96, cw - 0.04, 0.5, C.orange);
+    T(s, [{ text: e[0], options: { breakLine: true } }, { text: "重み " + e[1].toFixed(3), options: { fontSize: 8.5 } }], { x, y: 1.96, w: cw - 0.04, h: 0.5, fontSize: 10, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
   });
   sw4.forEach((r, i) => {
-    const y = my + rh * 2 + 0.02 + i * (rh + 0.02);
-    R(s, mx, y, c0, rh, C.teal);
-    T(s, `${r[0]} ×${r[1].toFixed(3)}`, { x: mx, y, w: c0, h: rh, fontSize: 9, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+    const y = my + i * (rh + 0.04);
+    R(s, mx, y, c0 - 0.04, rh, C.teal);
+    T(s, [{ text: r[0], options: { breakLine: true } }, { text: "重み " + r[1].toFixed(3), options: { fontSize: 8.5 } }], { x: mx, y, w: c0 - 0.04, h: rh, fontSize: 10, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
     ew4.forEach((e, j) => {
-      const wv = r[1] * e[1];
-      const hi = i === 0 && j === 3;
-      R(s, mx + c0 + j * cw, y, cw - 0.02, rh, hi ? C.peach : (wv > 0.07 ? "F6E3D2" : C.panel), { line: hi ? C.red : undefined, lw: 1.25 });
-      T(s, wv.toFixed(3), { x: mx + c0 + j * cw, y, w: cw - 0.02, h: rh, fontSize: 10, bold: hi, color: hi ? C.red : C.navy, align: "center", valign: "middle", margin: 0 });
+      const wv = r[1] * e[1], hi = i === 0 && j === 3, x = mx + c0 + j * cw;
+      R(s, x, y, cw - 0.04, rh, hi ? C.peach : (wv > 0.07 ? "F6E3D2" : C.panel), { line: hi ? C.red : undefined, lw: 2 });
+      T(s, wv.toFixed(3), { x, y, w: cw - 0.04, h: rh, fontSize: 12, bold: hi, color: hi ? C.red : C.navy, align: "center", valign: "middle", margin: 0 });
     });
   });
-  T(s, "16マスの重みの合計 ＝ 1", { x: 11.0, y: 4.94, w: 1.85, h: 0.22, fontSize: 8.5, color: C.muted, align: "right" });
+  T(s, "各マス＝南の重み × 東の重み（16マスの合計＝1）", { x: mx, y: 4.5, w: c0 + cw * 4, h: 0.26, fontSize: 9.5, color: C.muted, align: "center" });
+  // 赤いマスから右の図へ矢印
+  const cellR = mx + c0 + 4 * cw - 0.04, cellY = my + rh / 2;
+  line(s, cellR, cellY, 7.95, cellY, { color: C.red, width: 2, end: "triangle" });
 
-  R(s, 5.35, 5.2, 7.5, 1.7, C.navy, { round: true, rr: 0.06 });
-  T(s, "④ 南面・帯1 ＝ 16マスの「重み × そのマスの配置の保存値」を全部足す", { x: 5.5, y: 5.24, w: 7.2, h: 0.28, fontSize: 10.5, bold: true, color: C.orange });
+  // 右：赤いマスの配置
+  R(s, 8.0, 1.7, 4.85, 3.0, C.redL, { round: true, rr: 0.06 });
+  T(s, "赤いマス ＝ この配置", { x: 8.15, y: 1.75, w: 4.6, h: 0.28, fontSize: 11.5, bold: true, color: C.red });
+  const pk = 0.013, pcx = 9.1, pcy = 2.75;
+  const PP = (x, y) => [pcx + x * pk, pcy - y * pk];
+  const bx = (x0, x1, y0, y1, fill, dash) => { const a = PP(x0, y1); if (dash) R(s, a[0], a[1], (x1 - x0) * pk, (y1 - y0) * pk, C.white, { line: C.faint, dash: "dash" }); else R(s, a[0], a[1], (x1 - x0) * pk, (y1 - y0) * pk, fill); };
+  bx(-25, 25, -25, 25, C.navy);
+  bx(-25, 25, -85, -35, C.teal);   // 南：高さ25・隙間10
+  bx(50, 100, -25, 25, C.orange);  // 東：高さ50・隙間25
+  const swp = PP(-25, -25); R(s, swp[0], swp[1] - 0.035, 50 * pk, 0.07, C.red);
+  T(s, "中央", { x: PP(-25, 25)[0], y: PP(-25, 25)[1], w: 50 * pk, h: 50 * pk, fontSize: 8, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+  T(s, "南\n25m\n10m", { x: PP(-25, -35)[0], y: PP(-25, -35)[1], w: 50 * pk, h: 50 * pk, fontSize: 7, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+  T(s, "東\n50m\n25m", { x: PP(50, 25)[0], y: PP(50, 25)[1], w: 50 * pk, h: 50 * pk, fontSize: 7, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
+  T(s, [
+    { text: "南：高さ25m・隙間10m", options: { color: C.teal, bold: true, breakLine: true } },
+    { text: "東：高さ50m・隙間25m", options: { color: C.dorange, bold: true, breakLine: true } },
+    { text: "を同時に置いた配置", options: { color: C.navy, breakLine: true } },
+    { text: "→ SEBEで計算済み", options: { color: C.navy, bold: true } },
+  ], { x: 10.55, y: 2.25, w: 2.25, h: 1.2, fontSize: 9.5 });
+  T(s, "━ 南面・帯1 の値 y を使う", { x: 10.55, y: 3.5, w: 2.25, h: 0.24, fontSize: 9, bold: true, color: C.red });
+  R(s, 8.15, 3.95, 4.55, 0.62, C.white, { round: true, rr: 0.05 });
+  T(s, [
+    { text: "重み：0.400 × 0.400 ＝ 0.160", options: { color: C.navy, bold: true, breakLine: true } },
+    { text: "寄与：0.160 × 600（y は仮）＝ 96", options: { color: C.red, bold: true } },
+  ], { x: 8.25, y: 3.95, w: 4.4, h: 0.62, fontSize: 10, valign: "middle" });
+
+  // 下：式
+  R(s, 0.5, 4.85, 12.35, 2.05, C.navy, { round: true, rr: 0.06 });
+  T(s, "南面・帯1の予測 ＝ 16マスの「重み × そのマスの配置の保存値 y」を全部足す", { x: 0.7, y: 4.9, w: 12, h: 0.3, fontSize: 11.5, bold: true, color: C.orange });
   T(s, [
     ...M("ŷ_{南面,1} ＝ ", { color: C.white }),
     ...M("Σ_{b∈｛0,1｝⁴}", { color: "F2A65A" }),
     ...M(" [ Π_{i=1}^{4} q_{i}(b_{i}) ] ", { color: "7FD1C7" }),
     ...M("× y_{b}", { color: "F2D16B" }),
-  ], { x: 5.5, y: 5.52, w: 7.2, h: 0.34, fontSize: 12, bold: true, valign: "middle" });
-  T(s, M("　　　 ＝ 0.053×y_{1} ＋ 0.107×y_{2} ＋ 0.080×y_{3} ＋ … ＋ 0.053×y_{16}"), { x: 5.5, y: 5.84, w: 7.2, h: 0.28, fontSize: 10.5, bold: true, color: C.white });
-  T(s, ML([
-    ["例：赤枠のマス（南(25,10)・東(50,25)）の重み 0.400×0.400＝0.160。保存値が仮に600なら 0.160×600＝96", { color: "F2D16B" }],
-    ["y は「東と南を同時に置いた配置」のSEBE値。重みは20個の出力で共通で、面・帯ごとに y だけ変わる", { color: "CADCFC" }],
-    ["4棟あると、この表が 4×4×4×4＝256マス（次のページ）", { color: "CADCFC" }],
-  ]), { x: 5.5, y: 6.14, w: 7.25, h: 0.74, fontSize: 9, lineSpacingMultiple: 1.05 });
+    ...M("　＝ 0.053×y_{1} ＋ 0.107×y_{2} ＋ 0.080×y_{3} ＋ … ＋ 0.053×y_{16}", { color: C.white }),
+  ], { x: 0.7, y: 5.25, w: 12, h: 0.45, fontSize: 13, bold: true, valign: "middle" });
+  const chips = [["F2A65A", "Σ", "16マスを全部足す"], ["7FD1C7", "Π q", "そのマスの重み（南と東の割合の掛け算）"], ["F2D16B", "y", "そのマスの配置のSEBE値"]];
+  chips.forEach((c, i) => {
+    const x = 0.7 + i * 4.1;
+    R(s, x, 5.82, 0.6, 0.3, c[0], { round: true, rr: 0.05 });
+    T(s, c[1], { x, y: 5.82, w: 0.6, h: 0.3, fontSize: 10, bold: true, color: C.navy, align: "center", valign: "middle", margin: 0 });
+    T(s, c[2], { x: x + 0.68, y: 5.82, w: 3.35, h: 0.3, fontSize: 9.5, color: C.white, valign: "middle" });
+  });
+  T(s, "重みは20個の出力（4面×5帯）で共通。面・帯が変わると y だけが変わる。4棟あると 4×4×4×4＝256マス（次のページ）", { x: 0.7, y: 6.3, w: 12, h: 0.5, fontSize: 10, color: "CADCFC", valign: "middle" });
   s.addNotes("");
 }
 
@@ -997,7 +1066,7 @@ function story(s, idx) {
 // =====================================================================
 {
   const s = std(next(), 7, "4棟なら：4方向すべて高さ35m・隙間15mで、256配置を平均する");
-  story(s, 3);
+  story(s, 4);
   // 左：t と 1方向の重み
   R(s, 0.5, 1.7, 5.9, 5.2, C.panel, { round: true, rr: 0.06 });
   T(s, "1方向あたりの計算（説明用の格子）", { x: 0.65, y: 1.76, w: 5.6, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
@@ -1060,7 +1129,7 @@ function story(s, idx) {
 // =====================================================================
 {
   const s = std(next(), 7, "計算時間：1回30秒〜1分でも、全組み合わせは現実的でない");
-  story(s, 4);
+  story(s, 5);
   T(s, "全組み合わせをSEBEで事前計算する場合（1配置ずつ連続で実行）", { x: 0.5, y: 1.7, w: 12, h: 0.3, fontSize: 11.5, bold: true, color: C.navy });
   const em = { bold: true, color: C.red };
   table(s, [
@@ -1102,7 +1171,7 @@ function story(s, idx) {
 // =====================================================================
 {
   const s = std(next(), 7, "4方向で6,561通り → 17変数では別の学習方法が必要");
-  story(s, 5);
+  story(s, 6);
   table(s, [
     ["", "南1棟（完成）", "4方向版", "最終目標（17変数）"],
     ["補間する連続変数", "2（A, D）", "8（A, D × 4）", "13（中央高さ＋A, D, θ × 4）"],
@@ -1279,7 +1348,7 @@ function story(s, idx) {
     R(s, x, 1.7, w, 4.85, C.navy2, { round: true, rr: 0.06 });
     R(s, x, 1.7, w, 0.55, c[1], { round: true, rr: 0.06 });
     T(s, c[0], { x: x + 0.2, y: 1.7, w: w - 0.4, h: 0.55, fontSize: 14, bold: true, color: C.white, valign: "middle" });
-    T(s, bullets(c[2], { gap: 12 }), { x: x + 0.2, y: 2.45, w: w - 0.4, h: 4.0, fontSize: 11.5, color: C.white });
+    T(s, bullets(c[2], { gap: 14 }), { x: x + 0.2, y: 2.45, w: w - 0.4, h: 4.0, fontSize: 13, color: C.white });
   });
   T(s, "線形補間で全組み合わせを事前計算する方式は、17変数では成立しない。次は「空の遮られ方」の詳細を詰める。", { x: 0.7, y: 6.62, w: 11.9, h: 0.35, fontSize: 11.5, bold: true, color: C.orange });
   T(s, "壁面日射量予測ツールの開発", { x: 0.5, y: 7.13, w: 3.5, h: 0.28, fontSize: 9, color: "8FA0BC" });
