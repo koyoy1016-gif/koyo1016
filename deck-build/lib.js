@@ -6,6 +6,7 @@ const RDS = require('react-dom/server');
 const sharp = require('sharp');
 const fa = require('react-icons/fa');
 const SRC = require('./sources.json');
+const LEADS = (() => { try { return require('./' + (process.env.LEADS || 'leads.json')); } catch (e) { return {}; } })();
 
 const W = 13.333, H = 7.5, X0 = 0.5, CW = 12.333, Y0 = 1.8, YB = 6.95;
 const FONT = 'Yu Gothic';
@@ -119,7 +120,7 @@ function rich(text, base) {
   return out;
 }
 function baseOpts(o, size) {
-  return { fontFace: FONT, fontSize: size, color: o.color || C.ink, bold: !!o.bold, italic: !!o.italic, lang: 'ja-JP', lineSpacing: Math.round(size * LS), align: o.align || 'left' };
+  return { fontFace: o.face || FONT, fontSize: size, color: o.color || C.ink, bold: !!o.bold, italic: !!o.italic, lang: 'ja-JP', lineSpacing: Math.round(size * LS), align: o.align || 'left' };
 }
 
 function txt(s, text, o) {
@@ -296,7 +297,7 @@ function table(s, rows, o) {
       const cw = colW[ci] - 2 * mLR / 72;
       const n = need(c.t, fs, cw, bold) + 2 * mTB / 72;
       mh = Math.max(mh, n);
-      const base = { fontFace: FONT, fontSize: fs, color: txtc, bold, lang: 'ja-JP', lineSpacing: Math.round(fs * LS), align: c.align || (isHead ? 'center' : 'left') };
+      const base = { fontFace: c.face || FONT, fontSize: fs, color: txtc, bold, lang: 'ja-JP', lineSpacing: Math.round(fs * LS), align: c.align || (isHead ? 'center' : 'left') };
       return {
         text: rich(c.t, base),
         options: { fill: { color: fill }, valign: 'middle', align: c.align || (isHead ? 'center' : 'left'), margin: [mTB, mLR, mTB, mLR], border: [{ type: 'solid', pt: 0.75, color: 'CBD5E1' }, { type: 'solid', pt: 0.75, color: 'CBD5E1' }, { type: 'solid', pt: 0.75, color: 'CBD5E1' }, { type: 'solid', pt: 0.75, color: 'CBD5E1' }] },
@@ -369,7 +370,10 @@ function slide(o) {
   const s = pres.addSlide();
   curN = index.length + 1;
   s.background = { color: o.dark ? C.navy : C.bg };
-  const info = { n: curN, id: o.id || '', ch: o.ch || '', title: o.title, src: o.src || [], kinds: o.kinds || [], ref: o.ref || '' };
+  const LD = LEADS[o.title];
+  const title = (LD && LD.t) || o.title;
+  const lead = o.lead || (LD && LD.l);
+  const info = { n: curN, id: o.id || '', ch: o.ch || '', title: title, src: o.src || [], kinds: o.kinds || [], ref: o.ref || '' };
   index.push(info);
   if (!o.dark) {
     // 章チップ
@@ -387,10 +391,14 @@ function slide(o) {
       s.addText(K.t, { x: rx, y: 0.26, w, h: 0.34, margin: 0, fontFace: FONT, fontSize: 14, bold: true, color: K.c, fill: { color: K.f }, shape: pres.ShapeType.roundRect, rectRadius: 0.17, align: 'center', valign: 'middle', lang: 'ja-JP', isTextBox: true, fit: 'none', line: { color: K.c, width: 0.75 } });
       rx -= 0.12;
     });
-    // タイトル
-    const ts = o.tsize || 32;
-    { const nl = lineCount(o.title, ts, CW, true); if (nl > 2) warn('TITLE 3行以上: ' + o.title); }
-    s.addText(o.title, { x: X0, y: 0.68, w: CW, h: 1.05, margin: 0, fontFace: FONT, fontSize: ts, bold: true, color: C.ink, valign: 'middle', lang: 'ja-JP', lineSpacing: Math.round(ts * 1.25), isTextBox: true, fit: 'none' });
+    // タイトル（1行）＋説明文（最大2行）
+    const ts = 30;
+    if (lineCount(title, ts, CW, true) > 1) warn('TITLE 2行以上: ' + title);
+    s.addText(title, { x: X0, y: 0.62, w: CW, h: 0.5, margin: 0, fontFace: FONT, fontSize: ts, bold: true, color: C.ink, valign: 'middle', lang: 'ja-JP', lineSpacing: Math.round(ts * 1.25), isTextBox: true, fit: 'none' });
+    if (lead) {
+      if (lineCount(lead, 18, CW, false) > 2) warn('LEAD 3行以上: ' + plain(lead).slice(0, 30));
+      s.addText(rich(lead, baseOpts({ color: '2B3F55' }, 18)), { x: X0, y: 1.12, w: CW, h: 0.68, margin: 0, valign: 'top', isTextBox: true, fit: 'none' });
+    } else if (!o.noLead) warn('NO LEAD: ' + title);
     // フッター
     const ft = (o.src && o.src.length ? '出典：' + o.src.map(i => '[' + i + ']').join(' ') : '');
     if (ft) s.addText(ft, { x: X0, y: 7.08, w: 11.0, h: 0.28, margin: 0, fontFace: FONT, fontSize: 12, color: C.muted, valign: 'middle', lang: 'ja-JP', isTextBox: true, fit: 'none' });
@@ -472,14 +480,49 @@ function chip(s, K, x, y, w) {
   s.addText(K.t, { x, y, w, h: 0.34, margin: 0, fontFace: FONT, fontSize: 14, bold: true, color: K.c, fill: { color: K.f }, shape: pres.ShapeType.roundRect, rectRadius: 0.17, align: 'center', valign: 'middle', lang: 'ja-JP', isTextBox: true, fit: 'none', line: { color: K.c, width: 0.75 } });
 }
 
+function addSources(obj) { for (const k of Object.keys(obj)) { SRC.src[k] = obj[k]; if (!SRC.order.includes(k)) SRC.order.push(k); } }
+
+// 等幅コードブロック（ASCIIのコード向け）。lines=[文字列]。badges=行ごとの番号（任意）
+function code(s, x, y, w, lines, o = {}) {
+  const size = o.size || 18;
+  const lh = size * 1.35 / 72;
+  const h = lines.length * lh + 0.3;
+  rect(s, x, y, w, h, { fill: '0F2438', r: 0.12 });
+  const runs = lines.map((ln, i) => ({ text: ln === '' ? ' ' : ln, options: { fontFace: 'Courier New', fontSize: size, color: /^\s*#/.test(ln) ? '9FB6D1' : 'E2E8F0', lang: 'en-US', lineSpacing: Math.round(size * 1.35), breakLine: i < lines.length - 1 } }));
+  s.addText(runs, { x: x + 0.2, y: y + 0.12, w: w - 0.4, h: h - 0.24, margin: 0, valign: 'top', isTextBox: true, fit: 'none' });
+  lines.forEach(ln => { if (tw(ln, size) * 0.9 > w - 0.4) warn('code行が長い: ' + ln.slice(0, 30)); });
+  return h;
+}
+
+// プロトコルヘッダーの32ビット幅グリッド。rows=[[{t, bits, role?}]]（各行の合計＝32）
+function hdrGrid(s, x, y, w, rows, o = {}) {
+  const rh = o.rowH || 0.78;
+  rows.forEach((row, ri) => {
+    let cx = x;
+    const sum = row.reduce((a, c) => a + c.bits, 0);
+    row.forEach(c => {
+      const cw = w * c.bits / 32;
+      const Rr = ROLE[c.role || 'net'];
+      rect(s, cx, y + ri * rh, cw, rh, { fill: c.fill || Rr.l, line: Rr.d, lw: 1.25, r: 0.04 });
+      const label = c.t + (c.b ? '\n' + c.b : '');
+      const need_h = need(label, 18, cw - 0.1, true);
+      if (need_h > rh - 0.04) warn(`FIT hdr「${c.t}」必要${need_h.toFixed(2)} > ${(rh - 0.04).toFixed(2)} (w=${cw.toFixed(2)})`);
+      s.addText(rich(label, { fontFace: FONT, fontSize: 18, color: C.ink, bold: true, lang: 'ja-JP', lineSpacing: Math.round(18 * LS), align: 'center' }), { x: cx + 0.03, y: y + ri * rh, w: cw - 0.06, h: rh, margin: 0, valign: 'middle', align: 'center', isTextBox: true, fit: 'none' });
+      cx += cw;
+    });
+    if (sum !== 32) warn('hdrGrid行のビット合計が32でない: ' + sum);
+  });
+  return rows.length * rh;
+}
+
 async function finish(file) {
   await pres.writeFile({ fileName: file });
   return { index, warnings };
 }
 
 module.exports = {
-  pres, W, H, X0, CW, Y0, YB, FONT, C, ROLE, KINDS, SRC, LS,
+  pres, W, H, X0, CW, Y0, YB, FONT, C, ROLE, KINDS, LS,
   initIcons, iconData, ICON_NAMES, slide, N, txt, bullets, rect, node, head, card, callout, stat, badge, arrow, table, sequence, bar,
-  iconDot, iconOnly, tw, need, fit, lineCount, finish, index, warn, legend, numList, chip,
+  iconDot, iconOnly, tw, need, fit, lineCount, finish, index, warn, legend, numList, chip, addSources, code, hdrGrid, SRC,
   get warnings() { return warnings; },
 };

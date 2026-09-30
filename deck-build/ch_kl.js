@@ -14,7 +14,7 @@ module.exports = function (L, ctx) {
     }) });
     const st = [['CPU・メモリ・SSD・OS・プロセス', 'プログラムを動かす仕組み'], ['IP・サブネット・ゲートウェイ・ARP', '同じLANと外部への違い'], ['DHCP・DNS・NAT・TCP/UDP・TLS', 'Webへ接続するまでの流れ'], ['Linux・Windowsのサービス・権限・ログ', 'サーバーの起動・停止と状態確認'], ['Webサーバーとデータベース', '要求を受け、応答を返す流れ'], ['仮想化・クラウド', '物理機器と仮想資源の関係'], ['監視・バックアップ・冗長化', '故障を見つけ、復旧する方法'], ['スクリプト・Git・構成の自動化', '変更を記録し、再現できる形に'], ['コンテナ・高度な運用', '複数のアプリ・機器を効率管理']];
     st.forEach((t, i) => {
-      const x = 0.5 + (i % 3) * 4.165, y = 1.85 + Math.floor(i / 3) * 1.68;
+      const x = 0.5 + (i % 3) * 4.165, y = 2.1 + Math.floor(i / 3) * 1.6;
       const role = i < 3 ? 'net' : (i < 6 ? 'server' : 'sec');
       node(s, x, y, 4.0, 1.55, t[0], { role, size: 18, sub: t[1], subSize: 18, align: 'left' });
       badge(s, i + 1, x + 0.05, y + 0.05, { d: 0.42, role, size: 16 });
@@ -31,7 +31,7 @@ module.exports = function (L, ctx) {
     }) });
     const steps = [['更新', 'Windowsとメーカー提供の更新', 'sec'], ['回復手段', 'MFA・パスワード管理', 'sec'], ['保護の確認', 'Defender・FW・UAC', 'sec'], ['暗号化', 'BitLocker・回復キー保存', 'sec'], ['バックアップ', '保存と復元確認', 'sec'], ['表示・フォルダー', '拡張子表示・編集ソフト', 'device'], ['作業環境', 'Terminal・Git・VS Code', 'device'], ['Linux', 'WSLまたは仮想マシン', 'device'], ['通信の記録', '自宅のIP・DNS・出口', 'device']];
     steps.forEach((t, i) => {
-      const x = 0.5 + (i % 3) * 4.165, y = 1.85 + Math.floor(i / 3) * 1.38;
+      const x = 0.5 + (i % 3) * 4.165, y = 2.08 + Math.floor(i / 3) * 1.31;
       node(s, x, y, 4.0, 1.25, t[0], { role: t[2], size: 20, sub: t[1], subSize: 18, align: 'left', icon: null });
       badge(s, i + 1, x + 0.05, y + 0.05, { d: 0.4, role: t[2], size: 16 });
     });
@@ -197,8 +197,8 @@ module.exports = function (L, ctx) {
       why: '障害復旧（まず使える状態へ戻す）と、原因究明（再発防止につなげる）は別の仕事です。切り分けの結果と時刻・事実を記録して、報告に使います。',
     }) });
     const rows = [['① 端末', 'device', 'Wi-Fi接続・電源・OSの状態', 'netsh wlan show interfaces'], ['② LAN', 'net', 'IP・出口・DHCPの設定', 'ipconfig /all、出口への到達'], ['③ 名前解決', 'aux', 'DNSで名前からIPが得られるか', 'nslookup chatgpt.com'], ['④ 到達性', 'net', '経路・ルーター・ポートに届くか', 'tracert、Test-NetConnection -Port 443'], ['⑤ 暗号・認証', 'sec', 'TLS・証明書・時刻・ログイン', '時刻のずれ・証明書・ログイン状態'], ['⑥ サービス', 'server', 'アプリ・サーバーの状態', 'サービスの状態・ログ']];
-    txt(s, '何を見るか', { x: 3.25, y: 1.82, w: 4.5, h: 0.36, size: 18, bold: true, color: C.muted });
-    txt(s, '確認の手がかり', { x: 7.85, y: 1.82, w: 4.9, h: 0.36, size: 18, bold: true, color: C.muted });
+    txt(s, '何を見るか', { x: 3.25, y: 1.86, w: 4.5, h: 0.36, size: 18, bold: true, color: C.muted });
+    txt(s, '確認の手がかり', { x: 7.85, y: 1.86, w: 4.9, h: 0.36, size: 18, bold: true, color: C.muted });
     rows.forEach((r, i) => {
       const y = 2.2 + i * 0.7;
       node(s, 0.5, y, 2.6, 0.62, r[0], { role: r[1], solid: true, size: 18, line: false });

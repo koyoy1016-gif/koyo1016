@@ -54,9 +54,9 @@ module.exports = function (L, ctx) {
     const st = ['無線区間で再送が起きる', '届けやすい低速の方式へ切り替わる', '届く時間が増え、ばらつく', '間に合わない・失われるデータが増える'];
     st.forEach((t, i) => {
       const x = 0.5 + i * 3.14;
-      node(s, x, 2.0, 2.85, 1.7, t, { role: 'net', size: 20, solid: i === 3, line: false, fill: i === 3 ? undefined : R.net.l });
-      badge(s, i + 1, x + 0.3, 2.0, { d: 0.44, role: 'navy' });
-      if (i < 3) arrow(s, x + 2.85, 2.85, x + 3.14, 2.85, { color: C.ink, w: 3 });
+      node(s, x, 2.15, 2.85, 1.6, t, { role: 'net', size: 20, solid: i === 3, line: false, fill: i === 3 ? undefined : R.net.l });
+      badge(s, i + 1, x + 0.3, 2.15, { d: 0.44, role: 'navy' });
+      if (i < 3) arrow(s, x + 2.85, 2.95, x + 3.14, 2.95, { color: C.ink, w: 3 });
     });
     txt(s, 'ゲームで見える症状', { x: 0.5, y: 4.0, w: 6, h: 0.45, size: 22, bold: true, color: R.warn.d });
     ['相手が瞬間移動する', '操作の反映が遅れる', '接続が切れる'].forEach((t, i) => node(s, 0.5 + i * 4.19, 4.6, 3.95, 1.3, t, { role: 'warn', size: 22, icon: ['FaMapMarkedAlt', 'FaHourglassHalf', 'FaTimesCircle'][i] }));

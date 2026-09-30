@@ -57,13 +57,13 @@ module.exports = function (L, ctx) {
     const st = [['質問を\nトークン化', 'device'], ['数値として\nモデルへ入力', 'server'], ['入力に対する\n計算を行う', 'server'], ['次のトークンを\n決める', 'server'], ['文章に戻して\n利用者へ返す', 'device']];
     const xs = [0.5, 3.05, 5.6, 8.15, 10.7];
     st.forEach((t, i) => {
-      node(s, xs[i], 1.95, 2.13, 1.35, t[0], { role: t[1], solid: true, size: 18, line: false });
-      badge(s, i + 1, xs[i] + 0.2, 1.95, { d: 0.42, role: 'navy', size: 16 });
-      if (i < 4) arrow(s, xs[i] + 2.13, 2.625, xs[i + 1], 2.625, { color: C.ink, w: 3 });
+      node(s, xs[i], 2.15, 2.13, 1.3, t[0], { role: t[1], solid: true, size: 18, line: false });
+      badge(s, i + 1, xs[i] + 0.2, 2.15, { d: 0.42, role: 'navy', size: 16 });
+      if (i < 4) arrow(s, xs[i] + 2.13, 2.8, xs[i + 1], 2.8, { color: C.ink, w: 3 });
     });
-    arrow(s, 9.2, 3.3, 6.7, 3.3, { color: R.aux.d, w: 2.5, dash: true, label: '生成した内容も使って繰り返す', lsize: 18, lw: 4.6, dy: 0.18 });
+    arrow(s, 9.2, 3.55, 6.7, 3.55, { color: R.aux.d, w: 2.5, dash: true, label: '生成した内容も使って繰り返す', lsize: 18, lw: 4.6, dy: 0.15 });
     const terms = [['トークン', '文章を扱う単位。文字と1対1ではない'], ['重み', '学習済みの数値。高速に読み出す'], ['プリフィル・\nデコード', '入力を処理／続きを順次生成'], ['KVキャッシュ', '計算済みの情報を保持して再計算を避ける'], ['ストリーミング', '生成結果を順次届ける']];
-    terms.forEach((t, i) => card(s, 0.5 + i * 2.5, 3.95, 2.33, 2.15, t[0], t[1], { role: 'server', size: 18, tsize: 18 }));
+    terms.forEach((t, i) => card(s, 0.5 + i * 2.5, 4.1, 2.33, 2.05, t[0], t[1], { role: 'server', size: 18, tsize: 18 }));
     callout(s, 0.5, 6.3, 12.33, 0.6, '長い会話や多数の同時利用者は、KVキャッシュなどメモリの必要量を増やす', { kind: 'info', size: 18 });
   }
 
@@ -75,8 +75,7 @@ module.exports = function (L, ctx) {
       myth: ['GPU＝メモリではない。HBM＝SSDでもない。', 'NVIDIA＝メモリ製造会社でもない。'],
       why: '「計算能力だけ高くても、データが届かなければ待ち時間が発生する」ため、計算・メモリ・保存・通信・電力・冷却の組み合わせで性能が決まります。',
     }) });
-    rect(s, 0.4, 2.12, 12.53, 4.83, { fill: 'F8FAFC', line: R.gray.d, lw: 1.5, dash: 'dash', r: 0.16 });
-    txt(s, '点線の枠＝データセンターの中', { x: 0.5, y: 1.76, w: 8, h: 0.36, size: 18, bold: true, color: R.gray.d });
+    rect(s, 0.4, 1.95, 12.53, 5.0, { fill: 'F8FAFC', line: R.gray.d, lw: 1.5, dash: 'dash', r: 0.16 });
     node(s, 0.6, 3.45, 2.7, 1.4, '保存', { role: 'server', size: 20, sub: 'SSD・NAND', icon: 'FaHdd' });
     node(s, 3.6, 3.45, 2.7, 1.4, 'メモリ', { role: 'server', size: 20, sub: 'HBM・DRAM', icon: 'FaMemory' });
     node(s, 6.6, 3.45, 2.7, 1.4, '計算', { role: 'server', solid: true, size: 22, sub: 'GPU・AI専用チップ', icon: 'FaMicrochip', line: false });

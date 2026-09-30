@@ -138,22 +138,22 @@ module.exports = function (L, ctx) {
       cond: 'アクセスポイント・ルーター・ONUが一体の場合や、マンション共用回線・ホームルーターでは途中の構成が変わります。自宅の実機で、どの箱が何の役割かを確認してみましょう。',
       myth: '「Wi-Fi＝インターネット」ではありません。Wi-Fiは近距離の無線区間の名前で、インターネット回線やルーターとは別のものです。',
     }) });
-    node(s, 0.5, 1.95, 2.3, 0.95, 'Windows PC', { role: 'device', icon: 'FaLaptop', size: 18 });
-    node(s, 0.5, 3.25, 2.3, 0.95, 'iPhone', { role: 'device', icon: 'FaMobileAlt', size: 18 });
-    rect(s, 4.35, 1.85, 4.6, 2.55, { fill: 'F1F5F9', line: R.net.d, lw: 2, dash: 'dash', r: 0.16 });
-    txt(s, '家のWi-Fiルーター（一体型）', { x: 4.45, y: 1.9, w: 4.4, h: 0.4, size: 18, bold: true, color: R.net.d, align: 'center' });
+    node(s, 0.5, 2.1, 2.3, 0.95, 'Windows PC', { role: 'device', icon: 'FaLaptop', size: 18 });
+    node(s, 0.5, 3.4, 2.3, 0.95, 'iPhone', { role: 'device', icon: 'FaMobileAlt', size: 18 });
+    rect(s, 4.35, 1.98, 4.6, 2.55, { fill: 'F1F5F9', line: R.net.d, lw: 2, dash: 'dash', r: 0.16 });
+    txt(s, '家のWi-Fiルーター（一体型）', { x: 4.45, y: 2.03, w: 4.4, h: 0.4, size: 18, bold: true, color: R.net.d, align: 'center' });
     [['アクセスポイント', '電波'], ['ルーター', '行き先を決める'], ['DHCPなど', '設定を配る']].forEach((it, i) => {
-      node(s, 4.5, 2.4 + i * 0.63, 4.3, 0.56, it[0] + '（' + it[1] + '）', { role: 'net', size: 18, line: false, fill: 'FFFFFF' });
+      node(s, 4.5, 2.52 + i * 0.63, 4.3, 0.56, it[0] + '（' + it[1] + '）', { role: 'net', size: 18, line: false, fill: 'FFFFFF' });
     });
-    arrow(s, 2.8, 2.42, 4.35, 2.7, { color: R.device.d, w: 3, label: 'Wi-Fi', lsize: 18, dy: -0.32, dx: 0 });
-    arrow(s, 2.8, 3.72, 4.35, 3.5, { color: R.device.d, w: 3 });
-    node(s, 9.4, 2.35, 1.7, 1.5, 'ONU', { role: 'net', size: 18, sub: '光回線' });
-    node(s, 11.4, 2.35, 1.43, 1.5, 'ISP', { role: 'net', size: 18, sub: '通信会社' });
-    arrow(s, 8.95, 3.1, 9.4, 3.1, { color: R.net.d, w: 3 });
-    arrow(s, 11.1, 3.1, 11.4, 3.1, { color: R.net.d, w: 3 });
-    card(s, 0.5, 4.5, 3.95, 2.35, 'Wi-Fi', '端末とアクセスポイントを電波でつなぐ技術。近くの区間だけ', { role: 'device', size: 20, icon: 'FaWifi' });
-    card(s, 4.69, 4.5, 3.95, 2.35, 'インターネット回線', '自宅から通信会社のネットワークへつながる回線（光など）', { role: 'net', size: 20, icon: 'FaPlug' });
-    card(s, 8.88, 4.5, 3.95, 2.35, 'ルーター', '異なるネットワークの間でデータの行き先を決める機器', { role: 'net', size: 20, icon: 'FaRoute' });
+    arrow(s, 2.8, 2.57, 4.35, 2.85, { color: R.device.d, w: 3, label: 'Wi-Fi', lsize: 18, dy: -0.32, dx: 0 });
+    arrow(s, 2.8, 3.87, 4.35, 3.65, { color: R.device.d, w: 3 });
+    node(s, 9.4, 2.48, 1.7, 1.5, 'ONU', { role: 'net', size: 18, sub: '光回線' });
+    node(s, 11.4, 2.48, 1.43, 1.5, 'ISP', { role: 'net', size: 18, sub: '通信会社' });
+    arrow(s, 8.95, 3.23, 9.4, 3.23, { color: R.net.d, w: 3 });
+    arrow(s, 11.1, 3.23, 11.4, 3.23, { color: R.net.d, w: 3 });
+    card(s, 0.5, 4.7, 3.95, 2.2, 'Wi-Fi', '端末とアクセスポイントを電波でつなぐ技術。近くの区間だけ', { role: 'device', size: 20, icon: 'FaWifi' });
+    card(s, 4.69, 4.7, 3.95, 2.2, 'インターネット回線', '自宅から通信会社のネットワークへつながる回線（光など）', { role: 'net', size: 20, icon: 'FaPlug' });
+    card(s, 8.88, 4.7, 3.95, 2.2, 'ルーター', '異なるネットワークの間でデータの行き先を決める機器', { role: 'net', size: 20, icon: 'FaRoute' });
   }
 
   // ===== B3 Wi-Fi接続≠インターネット到達 =====
