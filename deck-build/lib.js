@@ -394,7 +394,12 @@ function slide(o) {
     // タイトル（1行）＋説明文（最大2行）
     const ts = 30;
     if (lineCount(title, ts, CW, true) > 1) warn('TITLE 2行以上: ' + title);
+    if (o.titleSuffix && tw(title, ts) * 1.04 + tw('　' + o.titleSuffix, 18) < CW - 0.15) {
+      const bo = { fontFace: FONT, lang: 'ja-JP', lineSpacing: Math.round(ts * 1.25) };
+      s.addText([{ text: title, options: { ...bo, fontSize: ts, bold: true, color: C.ink } }, { text: '　' + o.titleSuffix, options: { ...bo, fontSize: 18, bold: false, color: C.muted } }], { x: X0, y: 0.62, w: CW, h: 0.5, margin: 0, valign: 'middle', isTextBox: true, fit: 'none' });
+    } else {
     s.addText(title, { x: X0, y: 0.62, w: CW, h: 0.5, margin: 0, fontFace: FONT, fontSize: ts, bold: true, color: C.ink, valign: 'middle', lang: 'ja-JP', lineSpacing: Math.round(ts * 1.25), isTextBox: true, fit: 'none' });
+    }
     if (lead) {
       if (lineCount(lead, 18, CW, false) > 2) warn('LEAD 3行以上: ' + plain(lead).slice(0, 30));
       s.addText(rich(lead, baseOpts({ color: '2B3F55' }, 18)), { x: X0, y: 1.12, w: CW, h: 0.68, margin: 0, valign: 'top', isTextBox: true, fit: 'none' });
@@ -523,6 +528,6 @@ async function finish(file) {
 module.exports = {
   pres, W, H, X0, CW, Y0, YB, FONT, C, ROLE, KINDS, LS,
   initIcons, iconData, ICON_NAMES, slide, N, txt, bullets, rect, node, head, card, callout, stat, badge, arrow, table, sequence, bar,
-  iconDot, iconOnly, tw, need, fit, lineCount, finish, index, warn, legend, numList, chip, addSources, code, hdrGrid, SRC,
+  iconDot, iconOnly, tw, need, fit, lineCount, finish, index, warn, legend, numList, chip, addSources, code, hdrGrid, SRC, buildNotes, rich, baseOpts, charW, plain,
   get warnings() { return warnings; },
 };

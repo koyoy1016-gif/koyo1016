@@ -15,3 +15,10 @@
 - スマホ版（縦長6×12インチ、152ページ。内容が収まらない場合は自動で複数ページに分割）：`ORIENT=port node build_it.js` → `it_phone.pptx`
 - `kit.js` が `lib.js` を読み込む（同じ `node_modules`：`pptxgenjs`, `react`, `react-dom`, `react-icons`, `sharp`）
 - 用語を足すときは、該当章の `termSlide(...)` に行（`term, read, icon, what, ex, use, learn`、補足は `sup: true`）を追加する
+
+## 図でわかるIT用語ガイド v2（`deck-build/v2/`）
+「どこの話か（層）」の位置表示、用語ごとの関係図、場面の図、高校生向けの詳しい説明を加えた版。PC版（横長・262枚）とスマホ版（縦長・402ページ）を同じデータから作る。
+- 用語データ：`v2/terms_a.js`〜`terms_e.js`（97用語。`SPEC_terms.md` が書式）。校閲での修正は `v2/terms_fixes.js`。`v2/glossary.js` が結合する。
+- 検査：`node check_terms.js terms_all.js`（`terms_all.js` は `module.exports = require('./glossary.js');` の1行）
+- 描画キット：`kit.js`（`termDef` が用語ページ、`B.graph` が関係図、`B.scene` が場面図、`B.tower` が層ごとの用語マップ）
+- ビルド：`v2/` のファイルを `kit.js`・`lib.js`・`content_it1.js`・`content_it2.js`（旧版の図・表スライドを再利用）と同じ場所に置き、`node build_v2.js`（PC版）／`ORIENT=port node build_v2.js`（スマホ版）。`terms_index.json` が用語ID・章・層の索引。

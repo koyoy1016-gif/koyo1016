@@ -136,6 +136,10 @@ const B = {
   text: (items, o = {}) => ({ type: 'text', items, ...o }),
   tags: (items) => ({ type: 'tags', items }),
   pair: (l, r) => ({ type: 'pair', l, r }),
+  scene: (def) => ({ type: 'scene', def }),
+  tower: (rows) => ({ type: 'tower', rows }),
+  raw: (items) => ({ type: 'raw', items }),
+  graph: (def) => ({ type: 'graph', ...def }),
 };
 
 // ブロック→アイテム（{h, draw(s,x,y,w), gap}）
@@ -305,8 +309,432 @@ function expand(b, w) {
         });
       } }];
     }
+    case 'scene': return [{ h: P ? b.def.ph : b.def.h, draw: (s, x, y) => drawScene(s, x, y, b.def) }];
+    case 'tower': return expandTower(b, w);
+    case 'graph': { const lay = graphLayout(b, w); return [{ h: lay.H, draw: (s, x, y) => renderScene(s, x, y, [], lay.nodes, graphEdges(b), null) }]; }
+    case 'raw': return b.items;
     default: throw new Error('unknown block ' + b.type);
   }
+}
+
+// ======================= v2：層・関係図・場面図・用語ページ =======================
+const LAYERS = {
+  app:   { t: 'アプリ',       d: '使う人・作る人が直接さわるソフト', role: 'sec' },
+  mw:    { t: 'ミドルウェア', d: 'アプリを支える土台のソフト',       role: 'server' },
+  virt:  { t: '仮想化',       d: '1台を分けて使う・箱に詰める',       role: 'device' },
+  os:    { t: 'OS',           d: '機械を動かす基本ソフト',           role: 'net' },
+  hw:    { t: 'ハードウェア', d: '機械・部品そのもの',               role: 'gray' },
+  net:   { t: 'ネットワーク', d: '機械どうしをつなぐ道',             role: 'aux' },
+  cloud: { t: '置き場所',     d: 'サーバー室・クラウド',             role: 'sky' },
+  act:   { t: '活動・資格',   d: '技術の層ではなく人の活動',         role: 'rose' },
+};
+const STRIP = ['hw', 'os', 'virt', 'mw', 'app', 'net', 'cloud'];
+const TOWER = ['app', 'mw', 'virt', 'os', 'hw', 'net', 'cloud'];
+const G = { byId: {}, list: [], chNames: [] };
+const SHORT = {
+  software: 'ソフトウェア', datacenter: 'データセンター', rdb: 'RDB', sqlserver: 'SQL Server', awsdb: 'AWSのDB',
+  winapp: 'Windows アプリ開発', linuxapp: 'Linux アプリ開発', mobileapp: 'スマホアプリ開発', pcbuild: 'PC自作',
+  cloudvm: 'クラウド仮想サーバー', fe: '基本情報', apexam: '応用情報', excel: 'Excel集計', serverclient: 'サーバーとクライアント',
+  ai: 'AI', db: 'DB', os: 'OS', vm: '仮想マシン', private: 'プライベートクラウド', apserver: 'アプリサーバー', dbserver: 'DBサーバー',
+};
+const EXTRA_SRC = { postgres: ['D01'], docker: ['D02'], k8s: ['D03'], s3: ['D04'], itpassport: ['D05'], fe: ['D05'], apexam: ['D05'], mos: ['D05'] };
+function setGlossary(list, chNames) {
+  G.list = list; G.chNames = chNames; G.byId = {};
+  list.forEach(t => { G.byId[t.id] = t; });
+}
+const shortName = t => SHORT[t.id] || t.term.replace(/（.*?）/g, '');
+const layerOf = t => (t.lay && t.lay[0]) || 'act';
+const lRole = t => LAYERS[layerOf(t)].role;
+const isAct = lay => lay.length === 1 && lay[0] === 'act';
+const INACT = 'EEF1F5', INACT_T = '8A97A6';
+
+// ---- 位置表示（横長：1行の帯／縦長：塔） ----
+function drawStrip(s, x, y, w, lay) {
+  const H = 0.5;
+  txt(s, 'どこの話？', { x, y, w: 1.4, h: H, size: 17, bold: true, color: C.ink, valign: 'middle', label: 'strip' });
+  const sx = x + 1.45, sw = w - 1.45;
+  if (isAct(lay)) {
+    L.node(s, sx, y, sw, H, '技術の層ではなく、人の「活動・経験・資格」の話です', { role: 'rose', solid: true, size: 17, line: false });
+    return;
+  }
+  const gap = 0.06, grp = 0.22;
+  const slotW = (sw - 6 * gap - (grp - gap)) / 7;
+  STRIP.forEach((k, i) => {
+    const px = sx + i * (slotW + gap) + (i >= 5 ? grp - gap : 0);
+    const Ly = LAYERS[k];
+    const on = lay.includes(k);
+    rect(s, px, y, slotW, H, { fill: on ? dk(Ly.role) : INACT, r: 0.1 });
+    s.addText(Ly.t, { x: px, y, w: slotW, h: H, margin: 0, align: 'center', valign: 'middle', fontFace: FONT, fontSize: 16, bold: true, color: on ? 'FFFFFF' : INACT_T, lang: 'ja-JP', isTextBox: true, fit: 'none' });
+  });
+}
+const TOWER_H = 0.36 + 7 * 0.4 + 0.14;
+function drawTowerPort(s, x, y, w, lay) {
+  txt(s, 'どこの話？', { x, y, w, h: 0.32, size: 18, bold: true, color: C.ink, valign: 'middle', label: 'tower' });
+  let cy = y + 0.38;
+  if (isAct(lay)) {
+    L.node(s, x, cy, w, 0.9, '技術の層ではなく、人の「活動・経験・資格」の話です', { role: 'rose', solid: true, size: 17, line: false });
+    return;
+  }
+  TOWER.forEach((k, i) => {
+    if (i === 5) cy += 0.14;
+    const on = lay.includes(k), Ly = LAYERS[k];
+    rect(s, x, cy, w, 0.36, { fill: on ? dk(Ly.role) : INACT, r: 0.08 });
+    const runs = [{ text: Ly.t, options: { fontFace: FONT, fontSize: 15, bold: true, color: on ? 'FFFFFF' : INACT_T, lang: 'ja-JP' } }];
+    if (on) runs.push({ text: '　' + Ly.d, options: { fontFace: FONT, fontSize: 14, bold: false, color: 'FFFFFF', lang: 'ja-JP' } });
+    s.addText(runs, { x: x + 0.14, y: cy, w: w - 0.2, h: 0.36, margin: 0, valign: 'middle', isTextBox: true, fit: 'none' });
+    cy += 0.4;
+  });
+}
+const indicatorH = lay => (isAct(lay) ? 0.38 + 0.9 : TOWER_H);
+
+
+// 縦長用のコンパクトな位置表示（2段のチップ＋有効な層の説明）
+function indicatorLines(lay) { return isAct(lay) ? [] : STRIP.filter(k => lay.includes(k)); }
+function indicatorH2(lay) {
+  if (isAct(lay)) return 0.38 + 0.8;
+  return 0.36 + 0.42 + 0.06 + 0.42 + 0.08 + indicatorLines(lay).length * 0.3 + 0.04;
+}
+function drawIndicator2(s, x, y, w, lay) {
+  txt(s, 'どこの話？', { x, y, w, h: 0.32, size: 18, bold: true, color: C.ink, valign: 'middle', label: 'ind' });
+  let cy = y + 0.38;
+  if (isAct(lay)) { L.node(s, x, cy, w, 0.8, '技術の層ではなく、人の「活動・経験・資格」の話です', { role: 'rose', solid: true, size: 16, line: false }); return; }
+  const rows = [STRIP.slice(0, 4), STRIP.slice(4)];
+  rows.forEach((row, ri) => {
+    const gap = 0.08, sw = (w - (row.length - 1) * gap) / row.length;
+    row.forEach((k, i) => {
+      const Ly = LAYERS[k], on = lay.includes(k);
+      const px = x + i * (sw + gap);
+      rect(s, px, cy, sw, 0.42, { fill: on ? dk(Ly.role) : INACT, r: 0.1 });
+      s.addText(Ly.t, { x: px, y: cy, w: sw, h: 0.42, margin: 0, align: 'center', valign: 'middle', fontFace: FONT, fontSize: 14, bold: true, color: on ? 'FFFFFF' : INACT_T, lang: 'ja-JP', isTextBox: true, fit: 'none' });
+    });
+    cy += 0.48;
+  });
+  cy += 0.02;
+  indicatorLines(lay).forEach(k => {
+    const Ly = LAYERS[k];
+    s.addText([{ text: Ly.t, options: { fontFace: FONT, fontSize: 14, bold: true, color: dk(Ly.role), lang: 'ja-JP' } }, { text: '　' + Ly.d, options: { fontFace: FONT, fontSize: 14, bold: false, color: C.ink, lang: 'ja-JP' } }], { x: x + 0.05, y: cy, w: w - 0.1, h: 0.3, margin: 0, valign: 'middle', isTextBox: true, fit: 'none' });
+    cy += 0.3;
+  });
+}
+
+// ---- 関係図（用語を左、つながる用語を右。矢印にラベル） ----
+function relTarget(r) {
+  if (r.to) { const o = G.byId[r.to]; if (!o) throw new Error('rel to unknown: ' + r.to); return { name: shortName(o), role: lRole(o), sub: LAYERS[layerOf(o)].t }; }
+  return { name: r.t, role: 'gray', sub: '' };
+}
+const FAN_W = 5.0;
+function fanRowH(n, avail) { return Math.max(0.5, Math.min(0.74, (avail - (n - 1) * 0.12) / n)); }
+function fanH(n, rh) { return n * rh + (n - 1) * 0.12; }
+function drawFan(s, x, y, w, t, rh) {
+  const rels = t.rel, n = rels.length, H = fanH(n, rh);
+  const termW = 1.5, cw = 1.75, gap = w - termW - cw;
+  const role = lRole(t);
+  const nm = shortName(t);
+  const longest = Math.max(...(nm.match(/[A-Za-z0-9.+\-]+/g) || ['']).map(x => tw(x, 18) * 1.05));
+  const tsz = longest > termW - 0.2 ? (tw(nm.match(/[A-Za-z0-9.+\-]+/g).sort((a, b) => b.length - a.length)[0], 15) * 1.05 > termW - 0.2 ? 13 : 15) : 18;
+  L.node(s, x, y, termW, H, nm, { role, solid: true, size: tsz, sub: LAYERS[layerOf(t)].t, subSize: 14, line: false });
+  rels.forEach((r, i) => {
+    const ty = y + i * (rh + 0.12);
+    const T = relTarget(r);
+    const fs = rh < 0.58 ? 14 : 15;
+    const oneLine = lineCount(T.name, fs, cw - 0.2, true) <= 1;
+    const subOk = oneLine && T.sub && rh >= 0.62;
+    L.node(s, x + w - cw, ty, cw, rh, T.name, { role: T.role, size: fs, sub: subOk ? T.sub : undefined, subSize: 13, lw: 2 });
+    const cy = ty + rh / 2;
+    const x1 = x + termW + 0.03, x2 = x + w - cw - 0.03;
+    if (r.dir === 'in') L.arrow(s, x2, cy, x1, cy, { color: C.ink, w: 2.5 });
+    else L.arrow(s, x1, cy, x2, cy, { color: C.ink, w: 2.5, both: r.dir === 'both' });
+    txt(s, r.label, { x: x1 - 0.02, y: cy - 0.33, w: gap + 0.04, h: 0.3, size: 15, bold: true, color: C.muted, align: 'center', valign: 'bottom', label: 'fanlabel' });
+  });
+}
+
+// ---- 場面図（コンテナ枠・ノード・ラベル付き矢印を座標で配置） ----
+function edgePts(A, B, e) {
+  const ax = A.x + A.w / 2, ay = A.y + A.h / 2, bx = B.x + B.w / 2, by = B.y + B.h / 2;
+  const dx = bx - ax, dy = by - ay;
+  const noOv = (Math.min(A.y + A.h, B.y + B.h) - Math.max(A.y, B.y) <= 0.15) && (Math.min(A.x + A.w, B.x + B.w) - Math.max(A.x, B.x) <= 0.15);
+  const horiz = noOv && Math.abs(dy) > 0.9 * (A.h + B.h) / 2 ? false : Math.abs(dx) / ((A.w + B.w) / 2) > Math.abs(dy) / ((A.h + B.h) / 2);
+  const as = e.as || (horiz ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'b' : 't'));
+  const bs = e.bs || { r: 'l', l: 'r', b: 't', t: 'b' }[as];
+  const side = (R, sd, ox, oy) => (sd === 'r' ? [R.x + R.w, oy] : sd === 'l' ? [R.x, oy] : sd === 'b' ? [ox, R.y + R.h] : [ox, R.y]);
+  const yo0 = Math.max(A.y, B.y), yo1 = Math.min(A.y + A.h, B.y + B.h);
+  const xo0 = Math.max(A.x, B.x), xo1 = Math.min(A.x + A.w, B.x + B.w);
+  let a, b;
+  if (as === 'r' || as === 'l') {
+    const same = yo1 - yo0 > 0.15; const ya = same ? (yo0 + yo1) / 2 : ay, yb = same ? (yo0 + yo1) / 2 : by;
+    a = side(A, as, 0, ya); b = side(B, bs, 0, yb);
+  } else {
+    const same = xo1 - xo0 > 0.15; const xa = same ? (xo0 + xo1) / 2 : ax, xb = same ? (xo0 + xo1) / 2 : bx;
+    a = side(A, as, xa, 0); b = side(B, bs, xb, 0);
+  }
+  return [a, b];
+}
+function renderScene(s, ox, oy, boxesG, nodesG, edges, pov, textsG) {
+  const G2 = {};
+  boxesG.forEach(({ b, g }) => {
+    G2[b.id] = g;
+    const R = ROLE[b.role || 'gray'];
+    rect(s, ox + g.x, oy + g.y, g.w, g.h, { fill: b.fill || 'F7F9FB', line: R.d, lw: 1.5, dash: 'dash', r: 0.14 });
+    txt(s, g.opt.label || b.label, { x: ox + g.x + 0.15, y: oy + g.y + 0.07, w: g.w - 0.3, h: g.opt.lh || 0.36, size: g.opt.size || 16, bold: true, color: dk(b.role || 'gray'), label: 'sceneBox' });
+  });
+  nodesG.forEach(({ n, g }) => { G2[n.id] = g; });
+  (edges || []).forEach(e => {
+    const A = G2[e.a], B2 = G2[e.b];
+    if (!A || !B2) { if (pov && pov.skipped && (pov.skipped.has(e.a) || pov.skipped.has(e.b))) return; throw new Error(`scene edge: ${e.a}→${e.b} not found`); }
+    const pe = (pov && pov.edges && pov.edges[e.a + '>' + e.b]) || {};
+    const [pa, pb] = edgePts(A, B2, { ...e, ...pe });
+    const lab = pe.label !== undefined ? pe.label : e.label;
+    L.arrow(s, ox + pa[0], oy + pa[1], ox + pb[0], oy + pb[1], { color: e.color || C.ink, w: e.w || 2.5, dash: e.dash, both: e.both, head: e.head, label: lab, lsize: e.lsize || 16, lcolor: C.ink, dx: pe.dx !== undefined ? pe.dx : e.dx, dy: pe.dy !== undefined ? pe.dy : e.dy });
+  });
+  (textsG || []).forEach(({ t, g }) => {
+    txt(s, g.opt.t !== undefined ? g.opt.t : t.t, { x: ox + g.x, y: oy + g.y, w: g.w, h: g.h, size: g.opt.size || t.size || 16, bold: !!t.bold, color: t.color || C.ink, align: t.align || 'left', valign: t.valign || 'middle', label: 'sceneText' });
+  });
+  nodesG.forEach(({ n, g }) => {
+    const o = g.opt || {};
+    L.node(s, ox + g.x, oy + g.y, g.w, g.h, o.label || n.label, { role: n.role || 'gray', solid: !!n.solid, size: o.size || n.size || 18, sub: o.nosub ? undefined : n.sub, subSize: o.subSize || n.subSize || 14, icon: o.noicon ? undefined : n.icon, dash: n.dash, fill: n.fill, color: n.color, line: n.line, align: n.align });
+  });
+}
+function drawScene(s, ox, oy, d) {
+  const skipped = new Set((P && d.p && d.p.skip) || []);
+  const geo = (kind, o) => {
+    if (!P) return { x: o.x, y: o.y, w: o.w, h: o.h, opt: {} };
+    const q = d.p && d.p[kind] && d.p[kind][o.id];
+    if (!q) throw new Error(`scene(${d.name || ''}) 縦長の座標がありません: ${kind} ${o.id}`);
+    return { x: q[0], y: q[1], w: q[2], h: q[3], opt: q[4] || {} };
+  };
+  const boxesG = (d.boxes || []).filter(b => !skipped.has(b.id)).map(b => ({ b, g: geo('boxes', b) }));
+  const nodesG = (d.nodes || []).filter(n => !skipped.has(n.id)).map(n => ({ n, g: geo('nodes', n) }));
+  const textsG = (d.texts || []).filter(t => !skipped.has(t.id)).map(t => ({ t, g: geo('texts', t) }));
+  renderScene(s, ox, oy, boxesG, nodesG, d.edges, { edges: P && d.p ? d.p.edges : null, skipped }, textsG);
+}
+
+// ---- 自動配置の関係図（上から下へ段を並べる）----
+function graphLayout(b, W) {
+  const rows = [];
+  const useP = P && b.pl;
+  (useP ? b.pl : b.levels).forEach(lv => {
+    const items = lv.map(it => (typeof it === 'string' ? { id: it } : { id: it[0], x: it[1] }));
+    if (!P || useP) rows.push(items);
+    else { for (let i = 0; i < items.length; i += 3) rows.push(items.slice(i, i + 3)); }
+  });
+  const R = rows.length;
+  const nh = P ? 0.82 : (b.nh || (R >= 5 ? 0.64 : 0.78));
+  const pstep = (useP && b.pstep) || 1.35;
+  const H = P ? (R - 1) * pstep + nh : b.h;
+  const step = R > 1 ? (H - nh) / (R - 1) : 0;
+  const nodes = [];
+  rows.forEach((items, ri) => {
+    const k = items.length;
+    const nw = P ? (useP ? (b.pnw || 1.6) : Math.min(1.7, (W - (k - 1) * 0.2) / k)) : Math.min(2.5, (W - (k - 1) * 0.4) / k);
+    items.forEach((it, j) => {
+      const cxf = it.x != null && (!P || useP) ? it.x : (j + 0.5) / k;
+      const x = cxf * W - nw / 2;
+      const t = b.nodes && b.nodes[it.id];
+      const gl = G.byId[it.id];
+      const n = t ? { id: it.id, label: t.label, sub: t.sub, role: t.role || 'gray', solid: t.solid } : { id: it.id, label: shortName(gl), sub: LAYERS[layerOf(gl)].t, role: lRole(gl), solid: b.focus === it.id };
+      if (lineCount(n.label, 16, nw - 0.2, true) > 1) n.sub = undefined;
+      nodes.push({ n, g: { x, y: ri * step, w: nw, h: nh, opt: { size: 16, subSize: 13 } } });
+    });
+  });
+  return { H, nodes };
+}
+function graphEdges(b) { return ((P && b.pedges) || b.edges || []).map(e => ({ a: e[0], b: e[1], label: e[2], both: e[3] === 'both', dash: e[3] === 'dash', lsize: 15, ...(e[4] || {}) })); }
+
+// ---- 層の塔（各層にどんな用語が属するか） ----
+function expandTower(b, w) {
+  const rows = b.rows;
+  const out = [];
+  const chipSize = 16;
+  rows.forEach((row, ri) => {
+    const Ly = LAYERS[row.lay];
+    const labels = row.items.map(it => (typeof it === 'string' ? (G.byId[it] ? shortName(G.byId[it]) : it) : it.t));
+    const gapAfter = row.gapAfter != null ? row.gapAfter : (ri === rows.length - 1 ? 0 : 0.1);
+    if (!P) {
+      const lw = 3.4, cx0 = lw + 0.2, cwid = w - cx0 - 0.15;
+      const pos = []; let cx = 0, line = 0;
+      labels.forEach(lb => { const cw = tw(lb, chipSize) + 0.34; if (cx + cw > cwid) { cx = 0; line += 1; } pos.push([cx, line, cw, lb]); cx += cw + 0.1; });
+      const lines = line + 1;
+      const hh = Math.max(0.78, lines * 0.5 + 0.16);
+      out.push({ h: hh, gap: gapAfter, draw: (s, x, y) => {
+        rect(s, x, y, w, hh, { fill: ROLE[Ly.role].l, r: 0.1 });
+        L.node(s, x, y, lw, hh, Ly.t, { role: Ly.role, solid: true, size: 20, sub: Ly.d, subSize: 13, line: false });
+        pos.forEach(p => L.node(s, x + cx0 + p[0], y + 0.08 + p[1] * 0.5, p[2], 0.42, p[3], { role: Ly.role, fill: 'FFFFFF', size: chipSize, lw: 1.25 }));
+      } });
+    } else {
+      const cwid = w - 0.3;
+      const pos = []; let cx = 0, line = 0;
+      labels.forEach(lb => { const cw = tw(lb, chipSize) + 0.34; if (cx + cw > cwid) { cx = 0; line += 1; } pos.push([cx, line, cw, lb]); cx += cw + 0.1; });
+      const lines = line + 1;
+      const hh = 0.5 + lines * 0.5 + 0.12;
+      out.push({ h: hh, gap: gapAfter, draw: (s, x, y) => {
+        rect(s, x, y, w, hh, { fill: ROLE[Ly.role].l, r: 0.1 });
+        L.node(s, x, y, w, 0.44, Ly.t + '　' + Ly.d, { role: Ly.role, solid: true, size: 16, line: false, r: 0.1 });
+        pos.forEach(p => L.node(s, x + 0.15 + p[0], y + 0.54 + p[1] * 0.5, p[2], 0.42, p[3], { role: Ly.role, fill: 'FFFFFF', size: chipSize, lw: 1.25 }));
+      } });
+    }
+  });
+  return out;
+}
+
+// ---- 用語ページ ----
+const termKinds = t => (t.sup === false ? ['paste', 'supp'] : ['supp']);
+const termSrc = t => (t.sup === false ? ['U01', 'G01'] : ['G01']).concat(EXTRA_SRC[t.id] || []);
+function termNotes(t) {
+  const Ly = LAYERS[layerOf(t)];
+  const rel = t.rel.map(r => { const T = relTarget(r); return r.dir === 'in' ? `${T.name} →（${r.label}）→ ${shortName(t)}` : r.dir === 'both' ? `${shortName(t)} ⇄（${r.label}）⇄ ${T.name}` : `${shortName(t)} →（${r.label}）→ ${T.name}`; });
+  let n = `【一言】\n${t.one}\n\n【どこの話？】\n層：${t.lay.map(k => LAYERS[k].t).join('・')}（${Ly.d}）\n場所：${t.where}\n\n【くわしく】\n${t.what.join('\n')}\n\n【たとえるなら】\n${t.ana}\n\n【こんな場面で】\n${t.scene}\n`;
+  if (t.warn) n += `\n【勘違い・つまずき】\n${t.warn}\n`;
+  n += `\n【最初の学び方】\n${t.learn}\n\n【つながり】\n${rel.map(x => '・' + x).join('\n')}`;
+  if (t.quote) n += `\n\n【貼り付け資料の記載（要旨）】\n${t.quote}`;
+  return n;
+}
+function runsLabelBody(label, body, role, size, labelColor) {
+  const base = { fontFace: FONT, fontSize: size, lang: 'ja-JP', lineSpacing: Math.round(size * LS) };
+  return [{ text: label, options: { ...base, bold: true, color: labelColor || dk(role), breakLine: true } }, { text: body, options: { ...base, bold: false, color: C.ink } }];
+}
+function termLand(t) {
+  const role = lRole(t), R = ROLE[role];
+  const notes = termNotes(t);
+  const ref = t.sup === false ? `ご提供の用語解説（${t.term}）` : `編集者による補足（${t.term}）`;
+  const titleSuffix = t.read;
+  const s = L.slide({ id: 't-' + t.id, ch: G.chNames[t.ch], title: t.term, titleSuffix, lead: t.one, kinds: termKinds(t), src: termSrc(t), ref, notes });
+  pageCount += 1;
+  outIndex.push({ n: L.index.length, id: 't-' + t.id, ch: G.chNames[t.ch], title: t.term, src: termSrc(t), kinds: termKinds(t), ref, lay: t.lay });
+  const X = GEO.X, W = GEO.CW;
+  const readInTitle = tw(t.term, 30) * 1.04 + tw('　' + t.read, 18) < W - 0.15;
+  let y = 1.93;
+  drawStrip(s, X, y, W, t.lay); y += 0.5 + 0.1;
+  // 場所の帯
+  const wRuns = [{ text: '場所　', options: { fontFace: FONT, fontSize: 18, bold: true, color: dk(role), lang: 'ja-JP', lineSpacing: Math.round(18 * LS) } }, { text: t.where, options: { fontFace: FONT, fontSize: 18, bold: false, color: C.ink, lang: 'ja-JP', lineSpacing: Math.round(18 * LS) } }];
+  const wl = lineCount('場所　' + t.where, 18, W - 0.4, false);
+  const wh = wl * 18 * LS / 72 + 0.14;
+  rect(s, X, y, W, wh, { fill: R.l, r: 0.1 });
+  s.addText(wRuns, { x: X + 0.2, y, w: W - 0.4, h: wh, margin: 0, valign: 'middle', isTextBox: true, fit: 'none' });
+  y += wh + 0.1;
+  const top = y, bodyH = GEO.BOT - top;
+  const LW = W - FAN_W - 0.25;
+  // 左：くわしく
+  rect(s, X, top, LW, bodyH, { fill: 'FFFFFF', line: 'CBD5E1', lw: 1, r: 0.12 });
+  const iw = LW - 0.4, avail = bodyH - 0.24;
+  const readLine = '読み　' + t.read;
+  let used = readInTitle ? 0 : need(readLine, 18, iw) + 6 / 72;
+  const placed = [], spill = [];
+  t.what.forEach(p => {
+    const h = need(p, 18, iw) + 8 / 72;
+    if (!spill.length && (used + h <= avail + 0.02 || !placed.length)) { placed.push(p); used += h; } else spill.push(p);
+  });
+  if (used > avail + 0.05) L.warn(`OVERFLOW 「${t.term}」 くわしく ${used.toFixed(2)} > ${avail.toFixed(2)}`);
+  const runs = [];
+  if (!readInTitle) runs.push({ text: readLine, options: { fontFace: FONT, fontSize: 18, color: C.muted, bold: false, lang: 'ja-JP', lineSpacing: Math.round(18 * LS), paraSpaceAfter: 6, breakLine: true } });
+  placed.forEach((p, i) => runs.push({ text: p, options: { fontFace: FONT, fontSize: 18, color: C.ink, bold: false, lang: 'ja-JP', lineSpacing: Math.round(18 * LS), paraSpaceAfter: 8, breakLine: i < placed.length - 1 } }));
+  s.addText(runs, { x: X + 0.2, y: top + 0.12, w: iw, h: bodyH - 0.24, margin: 0, valign: 'top', isTextBox: true, fit: 'none' });
+  // 右：関係図
+  const fx = X + W - FAN_W;
+  rect(s, fx, top, FAN_W, bodyH, { fill: 'F6F8FA', r: 0.12 });
+  const n = t.rel.length;
+  const rh = fanRowH(n, bodyH - 0.3);
+  const fh = fanH(n, rh);
+  drawFan(s, fx + 0.1, top + (bodyH - fh) / 2, FAN_W - 0.2, t, rh);
+  // ---- つづき：たとえ・場面・注意・学び方（入りきらない場合は次のスライドへ）----
+  const cards = [];
+  if (spill.length) cards.push({ label: 'くわしく（つづき）', text: spill.join('\n'), role, icon: 'FaBook', wide: true });
+  cards.push({ label: 'たとえるなら', text: t.ana, role: 'aux', icon: 'FaLightbulb' });
+  cards.push({ label: 'こんな場面で', text: t.scene, role: 'net', icon: 'FaMapMarkerAlt' });
+  if (t.warn) cards.push({ label: '勘違い・つまずき', text: t.warn, role: 'warn', icon: 'FaExclamationTriangle' });
+  cards.push({ label: '最初の学び方', text: t.learn, role: 'sec', icon: 'FaRocket' });
+  const colW = (W - 0.25) / 2;
+  const rowsOf = [];
+  let buf = [];
+  cards.forEach(c => { if (c.wide) { if (buf.length) { rowsOf.push(buf); buf = []; } rowsOf.push([c]); } else { buf.push(c); if (buf.length === 2) { rowsOf.push(buf); buf = []; } } });
+  if (buf.length) rowsOf.push(buf);
+  const cardH = (c, cw) => Math.max(0.85, 0.14 + need(c.label + '　' + c.text, 18, cw - 0.7 - 0.18) + 0.14);
+  const rowHs = rowsOf.map(r => Math.max(...r.map(c => cardH(c, r.length === 1 ? W : colW))));
+  const TOP2 = 1.32;
+  const cap = GEO.BOT - TOP2;
+  const slides = [[]];
+  let acc = 0;
+  rowsOf.forEach((r, i) => {
+    const add = rowHs[i] + (slides[slides.length - 1].length ? 0.14 : 0);
+    if (slides[slides.length - 1].length && acc + add > cap + 0.02) { slides.push([]); acc = 0; }
+    acc += rowHs[i] + (slides[slides.length - 1].length ? 0.14 : 0);
+    slides[slides.length - 1].push(i);
+  });
+  slides.forEach((idxs, si) => {
+    const ttl = t.term + (si === 0 ? '（つづき）' : `（つづき${si + 1}）`);
+    const lead = si === 0 ? 'たとえ話と、実際の場面、つまずきやすい点、最初の一歩です。' : 'つづきです。' + (rowsOf[idxs[0]].some(c => c.label === '勘違い・つまずき') ? 'つまずきやすい点と、最初の一歩です。' : '最初の一歩です。');
+    const s2 = L.slide({ id: 't-' + t.id + 'b' + si, ch: G.chNames[t.ch], title: ttl, noLead: true, kinds: termKinds(t), src: termSrc(t), ref, notes: `【${t.term}：つづき】\nたとえ・場面・勘違い・最初の学び方をまとめたページです。内容は1枚目のノートと同じです。\n\n【たとえるなら】\n${t.ana}\n\n【こんな場面で】\n${t.scene}\n${t.warn ? '\n【勘違い・つまずき】\n' + t.warn + '\n' : ''}\n【最初の学び方】\n${t.learn}` });
+    pageCount += 1;
+    outIndex.push({ n: L.index.length, id: 't-' + t.id + 'b' + si, ch: G.chNames[t.ch], title: ttl, src: termSrc(t), kinds: termKinds(t), ref });
+    let cy = TOP2;
+    idxs.forEach(ri => {
+      const r = rowsOf[ri], rowH = rowHs[ri];
+      r.forEach((c, kx) => {
+        const cw = r.length === 1 ? W : colW;
+        const cx = X + (r.length === 1 ? 0 : kx * (colW + 0.25));
+        const CR = ROLE[c.role];
+        rect(s2, cx, cy, cw, rowH, { fill: CR.l, r: 0.14 });
+        L.iconDot(s2, c.icon, cx + 0.16, cy + 0.14, 0.42, { role: c.role });
+        const base = { fontFace: FONT, fontSize: 18, lang: 'ja-JP', lineSpacing: Math.round(18 * LS) };
+        const paras = c.text.split('\n');
+        const rr = [{ text: c.label + '　', options: { ...base, bold: true, color: dk(c.role) } }];
+        paras.forEach((p, pi) => rr.push({ text: p, options: { ...base, bold: false, color: C.ink, breakLine: pi < paras.length - 1, paraSpaceAfter: 6 } }));
+        s2.addText(rr, { x: cx + 0.7, y: cy + 0.12, w: cw - 0.7 - 0.18, h: rowH - 0.24, margin: 0, valign: 'top', isTextBox: true, fit: 'none' });
+      });
+      cy += rowH + 0.14;
+    });
+  });
+}
+function termPortItems(t) {
+  const role = lRole(t), R = ROLE[role];
+  const items = [];
+  items.push({ h: indicatorH2(t.lay), draw: (s, x, y, w) => drawIndicator2(s, x, y, w, t.lay) });
+  const iwid = GEO.CW - 0.4;
+  // 見出し付き（1つ目）／続き（見出しなし）／インラインラベルのカード
+  const card = (label, paras, r, o = {}) => {
+    const sz = BODY;
+    const inline = o.inline;
+    const head = !inline && label ? 0.42 : 0;
+    const bodyH = inline
+      ? paras.reduce((a, p, i) => a + need((i === 0 ? label + '　' : '') + p, sz, iwid) + 6 / 72, 0)
+      : paras.reduce((a, p) => a + need(p, sz, iwid) + 8 / 72, 0);
+    const hh = 0.12 + head + bodyH + 0.08;
+    return { h: hh, gap: o.gap, draw: (s, x, y, w) => {
+      rect(s, x, y, w, hh, { fill: ROLE[r].l, r: 0.14 });
+      if (head) txt(s, label, { x: x + 0.2, y: y + 0.1, w: w - 0.4, h: 0.4, size: 20, bold: true, color: dk(r), valign: 'middle', label: 'sechead' });
+      const runs = [];
+      paras.forEach((p, i) => {
+        const base = { fontFace: FONT, fontSize: sz, lang: 'ja-JP', lineSpacing: Math.round(sz * LS), paraSpaceAfter: inline ? 6 : 8 };
+        if (inline && i === 0) runs.push({ text: label + '　', options: { ...base, bold: true, color: dk(r) } });
+        runs.push({ text: p, options: { ...base, bold: false, color: C.ink, breakLine: i < paras.length - 1 } });
+      });
+      s.addText(runs, { x: x + 0.2, y: y + 0.1 + head, w: w - 0.4, h: hh - 0.16 - head, margin: 0, valign: 'top', isTextBox: true, fit: 'none' });
+    } };
+  };
+  items.push(card('場所', [t.where], role, { inline: true }));
+  const n = t.rel.length, rh = 0.74;
+  const fh = fanH(n, rh);
+  items.push({ h: 0.5 + fh + 0.06, draw: (s, x, y, w) => { L.head(s, x, y, w, 0.44, 'つながり（関係図）', { role, size: 18 }); drawFan(s, x, y + 0.5, w, t, rh); } });
+  // くわしく：段落ごとに独立したカード（ページをまたげるように）
+  items.push(card('読み　' + t.read, [], role, { inline: true }));
+  items.pop();
+  t.what.forEach((p, i) => items.push(card(i === 0 ? 'くわしく' : null, (i === 0 ? ['読み：' + t.read, p] : [p]), role, { gap: 0.08 })));
+  items.push(card('たとえるなら', [t.ana], 'aux', { inline: true }));
+  items.push(card('こんな場面で', [t.scene], 'net', { inline: true }));
+  if (t.warn) items.push(card('勘違い・つまずき', [t.warn], 'warn', { inline: true }));
+  items.push(card('最初の学び方', [t.learn], 'sec', { inline: true }));
+  return items;
+}
+function termPort(t) {
+  slideDef({
+    id: 't-' + t.id, ch: G.chNames[t.ch], title: t.term, lead: t.one, kinds: termKinds(t), src: termSrc(t),
+    ref: t.sup === false ? `ご提供の用語解説（${t.term}）` : `編集者による補足（${t.term}）`, notes: termNotes(t),
+    blocks: [{ type: 'raw', items: termPortItems(t) }],
+  });
+}
+function termDef(t) {
+  const wBefore = L.warnings.length;
+  if (P) termPort(t); else termLand(t);
+  L.warnings.slice(wBefore).forEach(m => { process.stdout.write(`  ⚠ ${t.id}: ${m.replace(/^\[slide \d+\] /, '')}\n`); });
 }
 
 // ---------- スライド ----------
@@ -416,9 +844,10 @@ function cover(def) {
     txt(s, def.title, { x: 0.8, y: 1.35, w: 8.3, h: 2.75, size: 44, bold: true, color: 'FFFFFF', label: 'cover title' });
     txt(s, def.sub, { x: 0.8, y: 4.35, w: 8.0, h: 1.0, size: 22, color: 'CADCFC', label: 'cover sub' });
     txt(s, def.meta, { x: 0.8, y: 5.5, w: 8.4, h: 1.5, size: 18, color: '9FB6D1', label: 'cover meta' });
+    const nch = (def.chips || []).length;
     (def.chips || []).forEach((t, i) => {
-      const y = 0.55 + i * 1.1;
-      L.node(s, 9.55, y, 3.3, 0.9, t.label, { role: t.role, solid: true, icon: t.icon, size: 20, line: false });
+      const y = nch > 6 ? 0.4 + i * 0.98 : 0.55 + i * 1.1;
+      L.node(s, 9.55, y, 3.3, nch > 6 ? 0.84 : 0.9, t.label, { role: t.role, solid: true, icon: t.icon, size: 20, line: false });
     });
   } else {
     s = pres.addSlide();
@@ -427,14 +856,14 @@ function cover(def) {
     txt(s, def.kicker, { x: 0.45, y: 0.7, w: 5.1, h: 0.4, size: 20, bold: true, color: '9FB6D1' });
     txt(s, def.title, { x: 0.45, y: 1.3, w: 5.1, h: 3.3, size: 36, bold: true, color: 'FFFFFF', label: 'cover title' });
     txt(s, def.sub, { x: 0.45, y: 4.8, w: 5.1, h: 1.9, size: 20, color: 'CADCFC', label: 'cover sub' });
-    (def.chips || []).slice(0, 6).forEach((t, i) => {
+    (def.chips || []).slice(0, 8).forEach((t, i) => {
       const col = i % 2, row = Math.floor(i / 2);
-      L.node(s, 0.45 + col * 2.6, 7.0 + row * 1.1, 2.5, 0.95, t.label, { role: t.role, solid: true, icon: t.icon, size: 18, line: false });
+      L.node(s, 0.45 + col * 2.6, 6.75 + row * 0.92, 2.5, 0.82, t.label, { role: t.role, solid: true, icon: t.icon, size: 18, line: false });
     });
-    txt(s, def.meta, { x: 0.45, y: 10.3, w: 5.1, h: 1.4, size: 18, color: '9FB6D1', label: 'cover meta' });
+    txt(s, def.meta, { x: 0.45, y: 10.5, w: 5.1, h: 1.35, size: 16, color: '9FB6D1', label: 'cover meta' });
     if (def.notes) s.addNotes(L.buildNotes({ notes: def.notes, kinds: [], src: def.src || [], ref: '表紙' }, { n: pageCount }));
   }
   outIndex.push({ n: pageCount, id: 'cover', ch: '', title: '表紙', src: def.src || [], kinds: [], ref: '表紙' });
 }
 
-module.exports = { L, B, P, GEO, slideDef, cover, outIndex, ROLE, C };
+module.exports = { L, B, P, GEO, slideDef, cover, outIndex, ROLE, C, setGlossary, termDef, LAYERS, shortName, G, dk };
