@@ -1,0 +1,345 @@
+{
+ "order": [
+  "B01",
+  "B02",
+  "B03",
+  "B04",
+  "B05",
+  "B06",
+  "B07",
+  "B08",
+  "B09",
+  "B10",
+  "B11",
+  "B12",
+  "B13",
+  "B14",
+  "B15",
+  "B16",
+  "B17",
+  "B18",
+  "B19",
+  "B20",
+  "B21",
+  "N01",
+  "N02",
+  "N03",
+  "N04",
+  "N05",
+  "N06",
+  "N07",
+  "N08",
+  "N09",
+  "N10",
+  "N11",
+  "N12",
+  "N13",
+  "N14",
+  "N15",
+  "N16",
+  "N17",
+  "N18",
+  "N19",
+  "N20",
+  "N21",
+  "N22",
+  "N23",
+  "N24",
+  "N25",
+  "N26"
+ ],
+ "src": {
+  "B01": {
+   "t": "暗号化DNSの説明",
+   "u": [
+    "https://www.cloudflare.com/en-ca/learning/dns/dns-over-tls/"
+   ]
+  },
+  "B02": {
+   "t": "Traditional NAT／NAPT：RFC 3022",
+   "u": [
+    "https://www.rfc-editor.org/rfc/rfc3022.html"
+   ]
+  },
+  "B03": {
+   "t": "HTTP/3とQUICの説明",
+   "u": [
+    "https://www.cloudflare.com/en-ca/learning/performance/what-is-http3/"
+   ]
+  },
+  "B04": {
+   "t": "NTP：RFC 5905",
+   "u": [
+    "https://www.rfc-editor.org/info/rfc5905/"
+   ]
+  },
+  "B05": {
+   "t": "MicrosoftとOpenAIの協業に関する2026年4月発表",
+   "u": [
+    "https://blogs.microsoft.com/blog/2026/04/27/the-next-phase-of-the-microsoft-openai-partnership/"
+   ]
+  },
+  "B06": {
+   "t": "NTTドコモ：電波に影響する環境",
+   "u": [
+    "https://www.docomo.ne.jp/area/connect/environs/"
+   ]
+  },
+  "B07": {
+   "t": "Supercell：Brawl Starsの対戦地域・マッチング",
+   "u": [
+    "https://support.supercell.com/brawl-stars/en/articles/battle-sites.html",
+    "https://support.supercell.com/brawl-stars/ja/articles/slow-matchmaking.html"
+   ]
+  },
+  "B08": {
+   "t": "Unity：一般的なゲームネットワークと遅延処理",
+   "u": [
+    "https://docs.unity.com/en-us/multiplayer/netcode/netcode",
+    "https://docs-multiplayer.unity3d.com/netcode/1.11.0/learn/dealing-with-latency/"
+   ]
+  },
+  "B09": {
+   "t": "OpenAI：応答のストリーミング",
+   "u": [
+    "https://developers.openai.com/api/docs/guides/streaming-responses"
+   ]
+  },
+  "B10": {
+   "t": "NVIDIAとSK Group：AI基盤・メモリの協業",
+   "u": [
+    "https://nvidianews.nvidia.com/news/sk-group-and-nvidia-expand-strategic-partnership-across-ai-factories-and-next-generation-memory"
+   ]
+  },
+  "B11": {
+   "t": "キオクシア：2026年7月30日の製品発表",
+   "u": [
+    "https://www.kioxia.com/ja-jp/business/news/2026/20260730-1.html"
+   ]
+  },
+  "B12": {
+   "t": "東京エレクトロン：2026年6月26日の発表",
+   "u": [
+    "https://www.tel.co.jp/news/topics/2026/20260626_001.html"
+   ]
+  },
+  "B13": {
+   "t": "IEA：Energy and AI",
+   "u": [
+    "https://www.iea.org/reports/energy-and-ai/executive-summary"
+   ]
+  },
+  "B14": {
+   "t": "Microsoft：データセンターの水利用",
+   "u": [
+    "https://local.microsoft.com/blog/understanding-water-use-at-microsoft-datacenters/"
+   ]
+  },
+  "B15": {
+   "t": "Stanford AI Index 2026：研究開発",
+   "u": [
+    "https://hai.stanford.edu/ai-index/2026-ai-index-report/research-and-development"
+   ]
+  },
+  "B16": {
+   "t": "Stanford AI Index 2026：経済",
+   "u": [
+    "https://hai.stanford.edu/ai-index/2026-ai-index-report/economy"
+   ]
+  },
+  "B17": {
+   "t": "米商務省BIS：半導体の輸出管理",
+   "u": [
+    "https://www.bis.gov/press-release/commerce-strengthens-export-controls-restrict-chinas-capability-produce-advanced-semiconductors-military",
+    "https://media.bis.gov/press-release/department-commerce-revises-license-review-policy-semiconductors-exported-china"
+   ]
+  },
+  "B18": {
+   "t": "欧州投資銀行：成長企業の資金調達",
+   "u": [
+    "https://www.eib.org/en/publications/online/all/the-scale-up-gap"
+   ]
+  },
+  "B19": {
+   "t": "欧州委員会：AI Gigafactories",
+   "u": [
+    "https://digital-strategy.ec.europa.eu/en/news/eu-launches-ai-gigafactories-call-boost-europes-computing-capacity-and-unlock-more-eu30-billion"
+   ]
+  },
+  "B20": {
+   "t": "ASML：EUV露光装置",
+   "u": [
+    "https://www.asml.com/en/products/euv-lithography-systems"
+   ]
+  },
+  "B21": {
+   "t": "Microsoft：ネットワーク・DNSの確認",
+   "u": [
+    "https://learn.microsoft.com/en-us/powershell/module/nettcpip/test-netconnection?view=windowsserver2025-ps",
+    "https://learn.microsoft.com/windows-server/networking/dns/troubleshoot/troubleshoot-dns-client"
+   ]
+  },
+  "N01": {
+   "t": "OpenAI：Work／Codexの料金・使用量",
+   "u": [
+    "https://learn.chatgpt.com/docs/pricing"
+   ]
+  },
+  "N02": {
+   "t": "OpenAI：ChatGPT Workの使用量とコスト",
+   "u": [
+    "https://learn.chatgpt.com/docs/enterprise/chatgpt-work-usage-and-cost"
+   ]
+  },
+  "N03": {
+   "t": "OpenAI：モデルの選び方",
+   "u": [
+    "https://learn.chatgpt.com/docs/model-selection"
+   ]
+  },
+  "N04": {
+   "t": "OpenAI：画像生成機能",
+   "u": [
+    "https://learn.chatgpt.com/docs/image-generation"
+   ]
+  },
+  "N05": {
+   "t": "Anthropic：Claudeでファイルを作成・編集",
+   "u": [
+    "https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude"
+   ]
+  },
+  "N06": {
+   "t": "Anthropic：Claude Sonnet 5.5、2026年9月28日発表",
+   "u": [
+    "https://www.anthropic.com/claude-sonnet-5-5"
+   ]
+  },
+  "N07": {
+   "t": "Anthropic：ClaudeのWeb検索",
+   "u": [
+    "https://support.claude.com/en/articles/10684626-enable-and-use-web-search"
+   ]
+  },
+  "N08": {
+   "t": "Anthropic：Claude Opus 5.5、2026年9月22日発表",
+   "u": [
+    "https://www.anthropic.com/claude-opus-5-5"
+   ]
+  },
+  "N09": {
+   "t": "Microsoft：Copilot in PowerPoint",
+   "u": [
+    "https://support.microsoft.com/en-us/powerpoint/frequently-asked-questions-about-copilot-in-powerpoint"
+   ]
+  },
+  "N10": {
+   "t": "Anthropic：Claude Haiku",
+   "u": [
+    "https://www.anthropic.com/claude/haiku"
+   ]
+  },
+  "N11": {
+   "t": "OpenAI：API料金",
+   "u": [
+    "https://developers.openai.com/api/docs/pricing"
+   ]
+  },
+  "N12": {
+   "t": "Anthropic：API料金",
+   "u": [
+    "https://platform.claude.com/docs/en/about-claude/pricing"
+   ]
+  },
+  "N13": {
+   "t": "Anthropic：Claude Codeと開発作業",
+   "u": [
+    "https://www.anthropic.com/news/claude-code-on-team-and-enterprise"
+   ]
+  },
+  "N14": {
+   "t": "LabBase：HPEが掲載した2027年新卒SE採用情報",
+   "u": [
+    "https://compass.labbase.jp/company/1916/recruit/41029"
+   ]
+  },
+  "N15": {
+   "t": "マイナビ2027：HPEの採用データ・給与例",
+   "u": [
+    "https://job.mynavi.jp/27/pc/corpinfo/displayEmployment/index/?corpId=515&recruitingCourseId=27058348"
+   ]
+  },
+  "N16": {
+   "t": "OpenWork：日本ヒューレット・パッカードの公開集計",
+   "u": [
+    "https://www.openwork.jp/company.php?m_id=a0910000000G22E"
+   ]
+  },
+  "N17": {
+   "t": "HPE：Juniper買収完了、2025年7月2日",
+   "u": [
+    "https://www.hpe.com/us/en/newsroom/press-release/2025/07/hewlett-packard-enterprise-closes-acquisition-of-juniper-networks-to-offer-industry-leading-comprehensive-cloud-native-ai-driven-portfolio.html"
+   ]
+  },
+  "N18": {
+   "t": "HPE：iLO",
+   "u": [
+    "https://www.hpe.com/us/en/collaterals/collateral.c04154343.html"
+   ]
+  },
+  "N19": {
+   "t": "HPE：iLO Redfish APIとPython",
+   "u": [
+    "https://developer.hpe.com/platform/ilo-restful-api/home/",
+    "https://servermanagementportal.ext.hpe.com/docs/redfishclients/python-redfish-library"
+   ]
+  },
+  "N20": {
+   "t": "HPE：NVIDIAとのAI基盤の協業、2026年3月",
+   "u": [
+    "https://www.hpe.com/us/en/newsroom/press-release/2026/03/hpe-accelerates-secure-scalable-production-ready-ai-through-new-innovations-with-nvidia.html"
+   ]
+  },
+  "N21": {
+   "t": "Microsoft：BitLocker回復キー・デバイス暗号化",
+   "u": [
+    "https://support.microsoft.com/en-us/windows/security/encryption/back-up-your-bitlocker-recovery-key",
+    "https://support.microsoft.com/en-us/windows/security/encryption/device-encryption-in-windows"
+   ]
+  },
+  "N22": {
+   "t": "Microsoft：WSL学習環境",
+   "u": [
+    "https://learn.microsoft.com/en-us/windows/wsl/setup/environment"
+   ]
+  },
+  "N23": {
+   "t": "HPE：技術トレーニングと認定",
+   "u": [
+    "https://education.hpe.com/ww/en/training/index.html",
+    "https://education.hpe.com/ww/en/training/certification.html"
+   ]
+  },
+  "N24": {
+   "t": "Google：Gemini・GoogleサービスのAI機能",
+   "u": [
+    "https://blog.google/products-and-platforms/products/google-one/fall-2026-ai-plan-updates/",
+    "https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-collection/",
+    "https://blog.google/products-and-platforms/products/workspace/voice-features-gmail-docs-keep/"
+   ]
+  },
+  "N25": {
+   "t": "Perplexity：Researchと提供機能",
+   "u": [
+    "https://www.perplexity.ai/help-center/en/articles/10738684-what-is-research-mode",
+    "https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you"
+   ]
+  },
+  "N26": {
+   "t": "xAI：X Search",
+   "u": [
+    "https://docs.x.ai/developers/tools/x-search"
+   ]
+  }
+ }
+}
