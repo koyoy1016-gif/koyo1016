@@ -1,0 +1,482 @@
+[
+ {
+  "id": "S01",
+  "t": "HPE：企業向け技術とHP Inc.との分社",
+  "u": "https://www.hpe.com/us/en/about/enterprise-technology-us.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S02",
+  "t": "HPE：日本の会社情報（日本ヒューレット・パッカード合同会社）",
+  "u": "https://www.hpe.com/jp/ja/collaterals/collateral.a50011874jpn.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S03",
+  "t": "マイナビ2027：日本HPE SE募集・待遇（給与は2025年4月実績、最終更新2026/8/6）",
+  "u": "https://job.mynavi.jp/27/pc/search/corp515/recruiting_course27058348/recruiting_course.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S04",
+  "t": "CTC：新卒の初任給と年収モデル",
+  "u": "https://www.ctc-g.co.jp/recruit/newgrads/salary-model/",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S05",
+  "t": "TISI：2026年7月1日の合併完了・商号変更",
+  "u": "https://www.tisi.jp/news/2026/tisi_info/20260701_1.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S06",
+  "t": "HPE：Integrated Lights-Out（iLO）",
+  "u": "https://www.hpe.com/us/en/products/compute/integrated-lights-out-ilo.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S07",
+  "t": "HPE：Private Cloud AI",
+  "u": "https://www.hpe.com/us/en/products/private-cloud/pcai.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S08",
+  "t": "Intel：What is a GPU?",
+  "u": "https://www.intel.com/content/www/us/en/products/docs/processors/what-is-a-gpu.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S09",
+  "t": "NVM Express：Specifications",
+  "u": "https://nvmexpress.org/specifications/",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S10",
+  "t": "NIST SP 800-145：The NIST Definition of Cloud Computing",
+  "u": "https://csrc.nist.gov/pubs/sp/800/145/final",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S11",
+  "t": "IBM：Object vs. file vs. block storage",
+  "u": "https://www.ibm.com/think/topics/object-vs-file-vs-block-storage",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S12",
+  "t": "Docker：Docker overview",
+  "u": "https://docs.docker.com/get-started/docker-overview/",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S13",
+  "t": "Kubernetes：Overview",
+  "u": "https://kubernetes.io/docs/concepts/overview/",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S14",
+  "t": "PostgreSQL：Tutorial",
+  "u": "https://www.postgresql.org/docs/current/tutorial.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S15",
+  "t": "AWS：What is Amazon S3?",
+  "u": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S16",
+  "t": "Cloudflare：What is DNS?",
+  "u": "https://www.cloudflare.com/learning/dns/what-is-dns/",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S17",
+  "t": "RFC 3022：Traditional NAT / NAPT",
+  "u": "https://www.rfc-editor.org/rfc/rfc3022.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S18",
+  "t": "RFC 9000：QUIC",
+  "u": "https://www.rfc-editor.org/rfc/rfc9000.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S19",
+  "t": "RFC 8446：TLS 1.3",
+  "u": "https://www.rfc-editor.org/rfc/rfc8446.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S20",
+  "t": "AWS：RAG と ファインチューニングの比較",
+  "u": "https://docs.aws.amazon.com/prescriptive-guidance/latest/retrieval-augmented-generation-options/rag-vs-fine-tuning.html",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S21",
+  "t": "IEA：Energy and AI（2025年報告）",
+  "u": "https://www.iea.org/reports/energy-and-ai/executive-summary",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S22",
+  "t": "Stanford HAI：AI Index 2026 研究開発",
+  "u": "https://hai.stanford.edu/ai-index/2026-ai-index-report/research-and-development",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S23",
+  "t": "OpenAI：ChatGPT Work／Codex 料金・使用量",
+  "u": "https://learn.chatgpt.com/docs/pricing ／ https://learn.chatgpt.com/docs/enterprise/chatgpt-work-usage-and-cost",
+  "st": "依頼者の追加調査で確認（2026/10/3）"
+ },
+ {
+  "id": "S24",
+  "t": "RFC 5905：NTP version 4",
+  "u": "https://www.rfc-editor.org/info/rfc5905/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S25",
+  "t": "Cloudflare：What is HTTP/3?",
+  "u": "https://www.cloudflare.com/en-ca/learning/performance/what-is-http3/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S26",
+  "t": "Microsoft：Microsoft と OpenAI の協業（2026年4月）",
+  "u": "https://blogs.microsoft.com/blog/2026/04/27/the-next-phase-of-the-microsoft-openai-partnership/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S27",
+  "t": "NTTドコモ：電波に影響する環境",
+  "u": "https://www.docomo.ne.jp/area/connect/environs/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S28",
+  "t": "Supercell：Brawl Stars 対戦地域・マッチング",
+  "u": "https://support.supercell.com/brawl-stars/en/articles/battle-sites.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S29",
+  "t": "Unity：ゲームネットワークと遅延への対処",
+  "u": "https://docs-multiplayer.unity3d.com/netcode/1.11.0/learn/dealing-with-latency/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S30",
+  "t": "OpenAI：応答のストリーミング",
+  "u": "https://developers.openai.com/api/docs/guides/streaming-responses",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S31",
+  "t": "NVIDIA：SK Group との AI 基盤・メモリの協業",
+  "u": "https://nvidianews.nvidia.com/news/sk-group-and-nvidia-expand-strategic-partnership-across-ai-factories-and-next-generation-memory",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S32",
+  "t": "キオクシア：2026年7月30日 製品発表",
+  "u": "https://www.kioxia.com/ja-jp/business/news/2026/20260730-1.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S33",
+  "t": "東京エレクトロン：2026年6月26日 発表",
+  "u": "https://www.tel.co.jp/news/topics/2026/20260626_001.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S34",
+  "t": "Microsoft：データセンターの水利用",
+  "u": "https://local.microsoft.com/blog/understanding-water-use-at-microsoft-datacenters/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S35",
+  "t": "Stanford HAI：AI Index 2026 経済",
+  "u": "https://hai.stanford.edu/ai-index/2026-ai-index-report/economy",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S36",
+  "t": "米商務省BIS：半導体の輸出管理",
+  "u": "https://www.bis.gov/press-release/commerce-strengthens-export-controls-restrict-chinas-capability-produce-advanced-semiconductors-military",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S37",
+  "t": "欧州投資銀行：The scale-up gap",
+  "u": "https://www.eib.org/en/publications/online/all/the-scale-up-gap",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S38",
+  "t": "欧州委員会：AI Gigafactories 公募",
+  "u": "https://digital-strategy.ec.europa.eu/en/news/eu-launches-ai-gigafactories-call-boost-europes-computing-capacity-and-unlock-more-eu30-billion",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S39",
+  "t": "ASML：EUV lithography systems",
+  "u": "https://www.asml.com/en/products/euv-lithography-systems",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S40",
+  "t": "Microsoft：Test-NetConnection／DNSクライアントのトラブルシュート",
+  "u": "https://learn.microsoft.com/en-us/powershell/module/nettcpip/test-netconnection",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S41",
+  "t": "OpenAI：モデルの選び方",
+  "u": "https://learn.chatgpt.com/docs/model-selection",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S42",
+  "t": "OpenAI：画像生成機能",
+  "u": "https://learn.chatgpt.com/docs/image-generation",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S43",
+  "t": "Anthropic：Claude でファイルを作成・編集",
+  "u": "https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S44",
+  "t": "Anthropic：Claude Sonnet 5.5（2026年9月28日発表）",
+  "u": "https://www.anthropic.com/claude-sonnet-5-5",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S45",
+  "t": "Anthropic：Claude の Web 検索",
+  "u": "https://support.claude.com/en/articles/10684626-enable-and-use-web-search",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S46",
+  "t": "Anthropic：Claude Opus 5.5（2026年9月22日発表）",
+  "u": "https://www.anthropic.com/claude-opus-5-5",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S47",
+  "t": "Microsoft：Copilot in PowerPoint FAQ",
+  "u": "https://support.microsoft.com/en-us/powerpoint/frequently-asked-questions-about-copilot-in-powerpoint",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S48",
+  "t": "Anthropic：Claude Haiku",
+  "u": "https://www.anthropic.com/claude/haiku",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S49",
+  "t": "OpenAI：API 料金",
+  "u": "https://developers.openai.com/api/docs/pricing",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S50",
+  "t": "Anthropic：API 料金",
+  "u": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S51",
+  "t": "Anthropic：Claude Code（Team／Enterprise）",
+  "u": "https://www.anthropic.com/news/claude-code-on-team-and-enterprise",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S52",
+  "t": "LabBase：HPE 2027年新卒SE採用情報",
+  "u": "https://compass.labbase.jp/company/1916/recruit/41029",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S53",
+  "t": "OpenWork：日本ヒューレット・パッカード（公開集計）",
+  "u": "https://www.openwork.jp/company.php?m_id=a0910000000G22E",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S54",
+  "t": "HPE：Juniper Networks 買収完了（2025年7月2日）",
+  "u": "https://www.hpe.com/us/en/newsroom/press-release/2025/07/hewlett-packard-enterprise-closes-acquisition-of-juniper-networks-to-offer-industry-leading-comprehensive-cloud-native-ai-driven-portfolio.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S55",
+  "t": "HPE：iLO RESTful API（Redfish）と Python",
+  "u": "https://developer.hpe.com/platform/ilo-restful-api/home/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S56",
+  "t": "HPE：NVIDIA との AI 基盤の発表（2026年3月）",
+  "u": "https://www.hpe.com/us/en/newsroom/press-release/2026/03/hpe-accelerates-secure-scalable-production-ready-ai-through-new-innovations-with-nvidia.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S57",
+  "t": "Microsoft：BitLocker 回復キーのバックアップ",
+  "u": "https://support.microsoft.com/en-us/windows/security/encryption/back-up-your-bitlocker-recovery-key",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S58",
+  "t": "Microsoft：WSL 開発環境の設定",
+  "u": "https://learn.microsoft.com/en-us/windows/wsl/setup/environment",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S59",
+  "t": "HPE：技術トレーニングと認定",
+  "u": "https://education.hpe.com/ww/en/training/certification.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S60",
+  "t": "Google：Gemini・Workspace の AI 機能",
+  "u": "https://blog.google/products-and-platforms/products/google-one/fall-2026-ai-plan-updates/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S61",
+  "t": "Perplexity：Research モードと提供プラン",
+  "u": "https://www.perplexity.ai/help-center/en/articles/10738684-what-is-research-mode",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S62",
+  "t": "xAI：X Search",
+  "u": "https://docs.x.ai/developers/tools/x-search",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S63",
+  "t": "HPE：日本向け学生・新卒採用",
+  "u": "https://careers.hpe.com/us/en/students-graduates-japan",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S64",
+  "t": "HPE：Morpheus ソフトウェア",
+  "u": "https://www.hpe.com/jp/ja/products/software/morpheus-software.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S65",
+  "t": "HPE：NonStop 製品資料",
+  "u": "https://www.hpe.com/jp/ja/collaterals/collateral.a50013513jpn.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S66",
+  "t": "OpenMoney：各社「ITエンジニア」年収ページ（原文章Aの集計、2026/10/3時点）",
+  "u": "https://openmoney.jp/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S67",
+  "t": "クラスメソッド：給与（会社公表の30代平均・等級別平均）",
+  "u": "https://careers.classmethod.jp/feature/salary/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S68",
+  "t": "NRI：2027年度 新卒募集要項",
+  "u": "https://working.nri.co.jp/recruit/2027/contents/recruiting/application.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S69",
+  "t": "KDDI：賃上げ・初任給引き上げの発表",
+  "u": "https://newsroom.kddi.com/news/detail/kddi_nr-965_4372.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S70",
+  "t": "NEC：労働・賃金に関する開示",
+  "u": "https://group.nec/global/ja/about/sustainability/social/labour",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S71",
+  "t": "マイナビ2027：日本HPE 会社概要（技術職の平均勤続年数）",
+  "u": "https://job.mynavi.jp/27/pc/search/corp515/outline.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S72",
+  "t": "OpenMoney：日本マイクロソフトへの転職者集計",
+  "u": "https://openmoney.jp/corporations/230/career_path_reports/to_corporation_list",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S73",
+  "t": "早稲田大学ビジネススクール関連記事：日本HP→AWS の経歴例",
+  "u": "https://www.wbs-entre.com/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S74",
+  "t": "IPA 試験レベル区分の解説（二次資料）",
+  "u": "https://www.cyber-u.ac.jp/ikou/article/006.html",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S75",
+  "t": "NVIDIA：日本向け基盤系ソリューションアーキテクト募集",
+  "u": "https://jobs.nvidia.com/careers/job/893382379753",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S76",
+  "t": "さくらインターネット：新卒採用",
+  "u": "https://www.sakura.ad.jp/recruit/graduates/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S77",
+  "t": "Cloudflare：DNS over TLS",
+  "u": "https://www.cloudflare.com/en-ca/learning/dns/dns-over-tls/",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S78",
+  "t": "原資料B・Cの編集者による一般的な技術説明（図・たとえ）",
+  "u": "—",
+  "st": "原資料に記載。今回は未再確認"
+ },
+ {
+  "id": "S79",
+  "t": "再構築時に追加した一般的な基礎説明（図・たとえ・説明用の例）",
+  "u": "—",
+  "st": "再構築時に追加。外部資料での個別確認はしていない"
+ },
+ {
+  "id": "S80",
+  "t": "IPA：基本情報技術者試験（レベル2）シラバス Ver.9.2（2026年1月公開とされる）／2027年度からの新試験制度のシラバス案",
+  "u": "https://www.ipa.go.jp/shiken/syllabus/gaiyou.html",
+  "st": "2026/10/4 検索結果で版名・公開時期を確認。IPAのページ本文はこの作業環境から閲覧できず未確認"
+ }
+]
